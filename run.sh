@@ -1,6 +1,7 @@
 #/bin/sh
 
 drush dl drupal-8.1.x --dev --drupal-project-rename
+copy .ht.router.php drupal/
 
 docker-compose up -d
 
