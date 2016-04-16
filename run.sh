@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 drush dl drupal-8.1.x --dev --drupal-project-rename
 cp .ht.router.php drupal/
