@@ -33,9 +33,11 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-openssl \
   php7-pcntl \
   php7-pdo_mysql \
+  php7-pdo_sqlite \
   php7-phar \
   php7-session \
   php7-xml \
+  php7-xdebug \
   php7-zlib \
   $PHPRUN_DEPS \
   && rm -fr /var/cache/apk/* \
@@ -53,9 +55,8 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-pear \
   --virtual .php-deps \
   && sed -i "s/exec \$PHP -C -n -q/exec \$PHP -C -q/g" /usr/bin/pecl \
-  && printf "\n" | pecl install apcu apcu_bc-beta \
+  && printf "\n" | pecl install apcu \
   && echo "extension=apcu.so" > /etc/php7/conf.d/apcu.ini \
-  && echo "extension=apc.so"  > /etc/php7/conf.d/z_apc.ini \
   && apk del --purge .php-deps \
   && rm -rf /var/cache/apk/*
 
