@@ -22,7 +22,7 @@ services:
       - front
 
   mysql:
-    image: percona:5.6
+    image: percona:5.7
     volumes:
       - ./db:/var/lib/mysql
     environment:
