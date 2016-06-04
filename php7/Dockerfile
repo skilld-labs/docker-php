@@ -1,0 +1,66 @@
+FROM alpine:edge
+MAINTAINER Andy Postnikov <andypost@ya.ru>
+
+# persistent / runtime deps
+ENV PHPIZE_DEPS \
+  autoconf \
+  file \
+  g++ \
+  gcc \
+  libc-dev \
+  make \
+  pkgconf \
+  re2c
+
+# add php7-xdebug if needed
+ENV PHPRUN_DEPS \
+  curl \
+  mariadb-client \
+  openssl \
+  patch
+
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  php7 \
+  php7-bcmath \
+  php7-ctype \
+  php7-curl \
+  php7-dom \
+  php7-gd \
+  php7-json \
+  php7-mbstring \
+  php7-mcrypt \
+  php7-opcache \
+  php7-openssl \
+  php7-pcntl \
+  php7-pdo_mysql \
+  php7-phar \
+  php7-session \
+  php7-xml \
+  php7-zlib \
+  $PHPRUN_DEPS \
+  && rm -fr /var/cache/apk/* \
+  && ln -s /usr/bin/php7 /usr/bin/php \
+  && wget https://getcomposer.org/installer -O - | php -- --filename=composer \
+  --install-dir=/usr/bin \
+  && wget http://files.drush.org/drush.phar -O /usr/bin/drush && chmod +x /usr/bin/drush
+
+COPY php.ini /etc/php7/conf.d/xx-drupal.ini
+
+# todo add php7-xdebug as needed
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  $PHPIZE_DEPS \
+  php7-dev \
+  php7-pear \
+  --virtual .php-deps \
+  && sed -i "s/exec \$PHP -C -n -q/exec \$PHP -C -q/g" /usr/bin/pecl \
+  && printf "\n" | pecl install apcu apcu_bc-beta \
+  && echo "extension=apcu.so" > /etc/php7/conf.d/apcu.ini \
+  && echo "extension=apc.so"  > /etc/php7/conf.d/z_apc.ini \
+  && apk del --purge .php-deps \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /srv
+
+EXPOSE 80
+
+CMD php -t /srv -S 0.0.0.0:80

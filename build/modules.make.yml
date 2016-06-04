@@ -1,0 +1,48 @@
+api: 2
+
+core: "8.x"
+
+defaults:
+  projects:
+    overwrite: TRUE
+
+projects:
+  admin_toolbar:
+    type: "module"
+    version: "1.14"
+
+  color_field:
+    type: "module"
+    version: "2.0-rc1"
+
+  config_update:
+    type: "module"
+    version: "1.1"
+
+  default_content:
+    type: "module"
+    version: "1.x-dev"
+
+  file_entity:
+    type: "module"
+    version: "2.x-dev"
+
+  restui:
+    type: "module"
+    version: "1.11"
+
+  video_embed_field:
+    type: "module"
+    version: "1.0"
+
+  entityqueue:
+    type: "module"
+    version: "1.x-dev"
+
+  machine_name:
+    type: "module"
+    version: "1.x-dev"
+
+  layouter:
+    type: "module"
+    version: "1.0-beta2"
