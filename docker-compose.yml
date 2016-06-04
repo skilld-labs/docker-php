@@ -3,6 +3,7 @@ version: "2"
 services:
   web:
     build: php7/.
+#    build: php56/.
 #    image: php7
     ports:
       - "8081:80"
