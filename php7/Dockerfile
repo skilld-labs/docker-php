@@ -16,11 +16,12 @@ ENV PHPIZE_DEPS \
 ENV PHPRUN_DEPS \
   curl \
   mariadb-client \
-  openssl \
+  php7-xdebug \
   patch
 
 RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
   php7 \
+  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -37,28 +38,21 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-phar \
   php7-session \
   php7-xml \
-  php7-xdebug \
   php7-zlib \
-  $PHPRUN_DEPS \
-  && rm -fr /var/cache/apk/* \
   && ln -s /usr/bin/php7 /usr/bin/php \
-  && wget https://getcomposer.org/installer -O - | php -- --filename=composer \
+  && php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === '070854512ef404f16bac87071a6db9fd9721da1684cd4589b1196c3faf71b9a2682e2311b36a5079825e155ac7ce150d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+  && php7 composer-setup.php \
   --install-dir=/usr/bin \
-  && wget http://files.drush.org/drush.phar -O /usr/bin/drush && chmod +x /usr/bin/drush
+  --filename=composer \
+  && php7 -r "unlink('composer-setup.php');" \
+  && php7 -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
+  && chmod +x /usr/bin/drush \
+  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  $PHPRUN_DEPS \
+  && rm -rf /var/cache/apk/*
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
-
-# todo add php7-xdebug as needed
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  $PHPIZE_DEPS \
-  php7-dev \
-  php7-pear \
-  --virtual .php-deps \
-  && sed -i "s/exec \$PHP -C -n -q/exec \$PHP -C -q/g" /usr/bin/pecl \
-  && printf "\n" | pecl install apcu \
-  && echo "extension=apcu.so" > /etc/php7/conf.d/apcu.ini \
-  && apk del --purge .php-deps \
-  && rm -rf /var/cache/apk/*
 
 WORKDIR /srv
 
