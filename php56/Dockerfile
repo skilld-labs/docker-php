@@ -1,18 +1,6 @@
 FROM alpine:3.4
 MAINTAINER Andy Postnikov <andypost@ya.ru>
 
-# persistent / runtime deps
-ENV PHPIZE_DEPS \
-  autoconf \
-  file \
-  g++ \
-  gcc \
-  libc-dev \
-  make \
-  pkgconf \
-  re2c
-
-# add php7-xdebug if needed
 ENV PHPRUN_DEPS \
   curl \
   mariadb-client \
@@ -38,8 +26,6 @@ RUN apk add --no-cache \
   php5-xml \
   php5-zlib \
   $PHPRUN_DEPS \
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  php-xdebug \
   && rm -fr /var/cache/apk/* \
   && wget https://getcomposer.org/installer -O - | php -- --filename=composer \
   --install-dir=/usr/bin \

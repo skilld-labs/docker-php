@@ -8,7 +8,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - ./drupal:/srv
+      - ./drupal:/srv:Z
     links:
       - mysql:mysql
       - mailhog:mailhog
@@ -24,7 +24,7 @@ services:
   mysql:
     image: percona:5.7
     volumes:
-      - ./db:/var/lib/mysql
+      - ./db:/var/lib/mysql:Z
     environment:
       MYSQL_DATABASE: d8
       MYSQL_USER: d8
