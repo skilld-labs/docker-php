@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:edge
 MAINTAINER Andy Postnikov <andypost@ya.ru>
 
 ENV PHPRUN_DEPS \
