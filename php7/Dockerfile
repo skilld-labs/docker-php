@@ -16,7 +16,6 @@ ENV PHPIZE_DEPS \
 ENV PHPRUN_DEPS \
   curl \
   mariadb-client \
-  php7-xdebug \
   patch
 
 RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
