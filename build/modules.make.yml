@@ -9,7 +9,7 @@ defaults:
 projects:
   admin_toolbar:
     type: "module"
-    version: "1.14"
+    version: "1.15"
 
   color_field:
     type: "module"
@@ -33,7 +33,7 @@ projects:
 
   video_embed_field:
     type: "module"
-    version: "1.0"
+    version: "1.1"
 
   entityqueue:
     type: "module"
