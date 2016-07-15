@@ -25,12 +25,12 @@ RUN apk add --no-cache \
   php5-phar \
   php5-xml \
   php5-zlib \
+  php5-soap \
   $PHPRUN_DEPS \
   && rm -fr /var/cache/apk/* \
   && wget https://getcomposer.org/installer -O - | php -- --filename=composer \
   --install-dir=/usr/bin \
   && wget http://files.drush.org/drush.phar -O /usr/bin/drush && chmod +x /usr/bin/drush
-
 COPY php.ini /etc/php5/conf.d/xx-drupal.ini
 
 WORKDIR /srv
