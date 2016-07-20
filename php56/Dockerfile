@@ -25,7 +25,6 @@ RUN apk add --no-cache \
   php5-phar \
   php5-xml \
   php5-zlib \
-  php5-soap \
   $PHPRUN_DEPS \
   && rm -fr /var/cache/apk/* \
   && wget https://getcomposer.org/installer -O - | php -- --filename=composer \
