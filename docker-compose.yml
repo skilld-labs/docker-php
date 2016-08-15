@@ -10,6 +10,7 @@ services:
     volumes:
       - ./drupal:/srv:Z
       - ./scripts:/scripts
+      - ./src:/src
     links:
       - mysql:mysql
       - mailhog:mailhog
@@ -23,7 +24,9 @@ services:
       - front
     environment:
       WORKFLOW: profile
+#      WORKFLOW: sql
       DRUPAL: 8
+#      DRUPAL: 7
 
   mysql:
     image: percona:5.7
