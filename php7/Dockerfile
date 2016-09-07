@@ -18,9 +18,8 @@ ENV PHPRUN_DEPS \
   mariadb-client \
   patch
 
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+RUN apk add --no-cache \
   php7 \
-  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -38,6 +37,8 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-session \
   php7-xml \
   php7-zlib \
+  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  php7-apcu \
   && ln -s /usr/bin/php7 /usr/bin/php \
   && php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
@@ -47,7 +48,7 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   && php7 -r "unlink('composer-setup.php');" \
   && php7 -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush \
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  && apk add --no-cache \
   $PHPRUN_DEPS \
   && rm -rf /var/cache/apk/*
 
