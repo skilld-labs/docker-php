@@ -1,6 +1,10 @@
 FROM alpine:edge
 MAINTAINER Andy Postnikov <andypost@ya.ru>
 
+# Create user www-data
+RUN addgroup -g 82 -S www-data && \
+	adduser -u 82 -D -S -G www-data www-data
+
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
   autoconf \
@@ -20,6 +24,7 @@ ENV PHPRUN_DEPS \
 
 RUN apk add --no-cache \
   php7 \
+  php7-fpm \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -52,10 +57,16 @@ RUN apk add --no-cache \
   $PHPRUN_DEPS \
   && rm -rf /var/cache/apk/*
 
+
+COPY php-fpm.conf /etc/php7/
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
+# Create work dir
+#RUN mkdir -p /var/www/html && chown -R $HOST_UID:$HOST_GID /var/www
 WORKDIR /var/www/html
+#VOLUME /var/www/html
+
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["php-fpm7", "-F"]
