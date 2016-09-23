@@ -57,3 +57,5 @@ COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 WORKDIR /var/www/html
 
 EXPOSE 9000
+
+CMD ["php-fpm"]
