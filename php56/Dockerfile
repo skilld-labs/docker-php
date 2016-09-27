@@ -7,7 +7,9 @@ ENV PHPRUN_DEPS \
   openssl \
   patch
 
-RUN apk add --no-cache \
+ENV TERM xterm
+
+RUN apk add --no-cache --upgrade \
   php5 \
   php5-apcu \
   php5-bcmath \

@@ -18,7 +18,9 @@ ENV PHPRUN_DEPS \
   mariadb-client \
   patch
 
-RUN apk add --no-cache \
+ENV TERM xterm
+
+RUN apk add --no-cache --upgrade \
   php7 \
   php7-bcmath \
   php7-ctype \
