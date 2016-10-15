@@ -4,15 +4,15 @@ ENV SOLR_VERSION 4.10.4
 ENV SOLR solr-$SOLR_VERSION
 ENV SOLR_USER solr
 
-RUN apk add --no-cache openjdk8-jre && \
+RUN apk add --no-cache openjdk8-jre tar && \
   addgroup -S $SOLR_USER && \
   adduser -S $SOLR_USER $SOLR_USER && \
-  mkdir -p /opt && \
+  mkdir -p /opt/solr && \
   wget -O /opt/$SOLR.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/$SOLR.tgz && \
-  tar -C /opt --extract --file /opt/$SOLR.tgz && \
+  tar -C /opt/solr --extract --file /opt/$SOLR.tgz --strip-components=1 && \
   rm /opt/$SOLR.tgz && \
-  ln -s /opt/$SOLR /opt/solr && \
-  chown -R $SOLR_USER:$SOLR_USER /opt/solr /opt/$SOLR
+  rm -Rf /opt/solr/docs && \
+  chown -R $SOLR_USER:$SOLR_USER /opt/solr
 
 EXPOSE 8983
 WORKDIR /opt/solr/example
