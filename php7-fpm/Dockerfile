@@ -1,35 +1,26 @@
 FROM alpine:edge
 MAINTAINER Andy Postnikov <andypost@ya.ru>
 
-# Create user www-data
-RUN addgroup -g 82 -S www-data && \
-	adduser -u 82 -D -S -G www-data www-data
-
-# persistent / runtime deps
-ENV PHPIZE_DEPS \
-  autoconf \
-  file \
-  g++ \
-  gcc \
-  libc-dev \
-  make \
-  pkgconf \
-  re2c
-
-# add php7-xdebug if needed
+# Add optional packages.
 ENV PHPRUN_DEPS \
   curl \
   mariadb-client \
-  patch
+  patch \
+  sqlite
 
-RUN apk add --no-cache \
+RUN set -e \
+  && mkdir -p /var/www \
+  && adduser -u 1000 -D -h /var/www/html www-data \
+  && apk add --no-cache \
   php7 \
   php7-fpm \
+  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
   php7-dom \
   php7-gd \
+  php7-gmp \
   php7-json \
   php7-mbstring \
   php7-mcrypt \
@@ -40,32 +31,27 @@ RUN apk add --no-cache \
   php7-pdo_sqlite \
   php7-phar \
   php7-session \
+  php7-xdebug \
   php7-xml \
   php7-zlib \
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  php7-apcu \
+  $PHPRUN_DEPS \
+  && rm -fr /var/cache/apk/* \
   && ln -s /usr/bin/php7 /usr/bin/php \
   && php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === 'aa96f26c2b67226a324c27919f1eb05f21c248b987e6195cad9690d5c1ff713d53020a02ac8c217dbf90a7eacc9d141d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php7 composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
   && php7 -r "unlink('composer-setup.php');" \
   && php7 -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
-  && chmod +x /usr/bin/drush \
-  && apk add --no-cache \
-  $PHPRUN_DEPS \
-  && rm -rf /var/cache/apk/*
-
+  && chmod +x /usr/bin/drush
 
 COPY php-fpm.conf /etc/php7/
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
-# Create work dir
-#RUN mkdir -p /var/www/html && chown -R $HOST_UID:$HOST_GID /var/www
+#USER www-data
 WORKDIR /var/www/html
 #VOLUME /var/www/html
-
 
 EXPOSE 9000
 

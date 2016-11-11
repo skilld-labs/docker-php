@@ -9,8 +9,11 @@ ENV PHPRUN_DEPS \
   sqlite
 
 RUN set -e \
+  && mkdir -p /var/www \
+  && adduser -u 1000 -D -h /var/www/html www-data \
   && apk add --no-cache \
   php5 \
+  php5-fpm \
   php5-apcu \
   php5-bcmath \
   php5-ctype \
@@ -40,10 +43,13 @@ RUN set -e \
   && php -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
+COPY php-fpm.conf /etc/php5/
 COPY php.ini /etc/php5/conf.d/xx-drupal.ini
 
-WORKDIR /srv
+#USER www-data
+WORKDIR /var/www/html
+#VOLUME /var/www/html
 
-EXPOSE 80
+EXPOSE 9000
 
-CMD ["php", "-t", "/srv", "-S", "0.0.0.0:80"]
+CMD ["php-fpm", "-F"]

@@ -17,6 +17,7 @@ services:
       - mailhog
     restart: always
     command: php -t /srv -S 0.0.0.0:80 .ht.router.php
+#    command: php -d zend_extension=xdebug.so -t /srv -S 0.0.0.0:80 .ht.router.php
     networks:
       - back
       - front
