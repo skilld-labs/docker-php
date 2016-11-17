@@ -8,9 +8,11 @@ ENV PHPIZE_DEPS \
   g++ \
   gcc \
   libc-dev \
+  libxml2-dev \
   make \
   pkgconf \
-  re2c
+  re2c \
+  yaml-dev
 
 # add php7-xdebug if needed
 ENV PHPRUN_DEPS \
@@ -18,12 +20,14 @@ ENV PHPRUN_DEPS \
   mariadb-client \
   patch
 
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+ENV TERM xterm
+
+RUN apk add --no-cache --upgrade \
   php7 \
-  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
+  php7-dev \
   php7-dom \
   php7-gd \
   php7-json \
@@ -31,6 +35,7 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-mcrypt \
   php7-opcache \
   php7-openssl \
+  php7-pear \
   php7-pcntl \
   php7-pdo_mysql \
   php7-pdo_sqlite \
@@ -38,18 +43,31 @@ RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/te
   php7-session \
   php7-xml \
   php7-zlib \
+  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  php7-apcu \
+
+  $PHPIZE_DEPS \
+
+  # Install PHP extensions through Pecl
+  && sed -ie 's/-n//g' /usr/bin/pecl \
+  && pecl install yaml-2.0.0 \
+  && echo 'extension=yaml.so' > /etc/php7/conf.d/yaml.ini \
+
   && ln -s /usr/bin/php7 /usr/bin/php \
   && php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === 'aa96f26c2b67226a324c27919f1eb05f21c248b987e6195cad9690d5c1ff713d53020a02ac8c217dbf90a7eacc9d141d') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php7 composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
   && php7 -r "unlink('composer-setup.php');" \
   && php7 -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush \
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  && apk add --no-cache \
   $PHPRUN_DEPS \
-  && rm -rf /var/cache/apk/*
+  && rm -rf /var/cache/apk/* \
+
+  # Cleanup after phpizing
+  && rm -rf /usr/include/php /usr/lib/php/build /usr/lib/php7/modules/*.a
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
