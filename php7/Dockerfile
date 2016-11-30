@@ -1,6 +1,20 @@
 FROM alpine:edge
 MAINTAINER Andy Postnikov <andypost@ya.ru>
 
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+LABEL org.label-schema.build-date=$BUILD_DATE \
+    org.label-schema.name="Custom PHP 7 image" \
+    org.label-schema.description="Custom PHP 7 image to run Drupal 8" \
+    org.label-schema.url="https://github.com/skilld-labs/docker-php" \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
+    org.label-schema.vendor="Skilld" \
+    org.label-schema.version=$VERSION \
+    org.label-schema.schema-version="1.0"
+
 # persistent / runtime deps
 ENV PHPIZE_DEPS \
   autoconf \
