@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.5
 
 ENV SOLR_VERSION 4.10.4
 ENV SOLR solr-$SOLR_VERSION
