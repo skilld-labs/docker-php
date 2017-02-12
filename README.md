@@ -36,31 +36,17 @@ Local `db` directory stores mysql database files and `drupal` hold core.
       build: php7-pgsql/.
   ```
 
-## Xdebug support
+#### XDebug support
 
-You can auto enable xdebug in next PHP images:
- * skilldlabs/php:7.1-fpm
- * skilldlabs/php:7-fpm
- * skilldlabs/php:56-fpm
+To enable xdebug in PHP container add a `command` instruction.
 
 Example usage:
   ```yaml
   version: "2"
   
-  services:
-    apache:
-      image: skilldlabs/skilld-docker-apache
-      environment:
-        APACHE_UPSTREAM_NAME: php
-      volumes_from:
-        - php
-      ports:
-        - "80:80"
-  
     php:
-      image: skilldlabs/php:7.1-fpm
+      image: skilldlabs/php:7-fpm
       volumes:
         - ./docroot:/var/www/html
-      environment:
-        PHP_XDEBUG_ENABLED: 1
+      command: php-fpm -F -d zend_extension=xdebug.so
   ```
