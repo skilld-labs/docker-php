@@ -82,7 +82,7 @@ RUN set -ex \
       /var/cache/apk/*v \
       /tmp/* \
       /root/.composer \
-      /usr/src/php
+      /usr/src
 
 COPY php-fpm.conf /usr/local/etc/
 COPY php.ini $PHP_INI_DIR/conf.d/xx-drupal.ini
