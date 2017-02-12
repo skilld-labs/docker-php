@@ -60,9 +60,6 @@ RUN set -e \
 COPY php-fpm.conf /etc/php7/
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
-COPY skilld-php-entrypoint.sh /usr/local/bin/skilld-php-entrypoint
-ENTRYPOINT ["skilld-php-entrypoint"]
-
 WORKDIR /var/www/html
 
 EXPOSE 9000
