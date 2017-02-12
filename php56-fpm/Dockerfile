@@ -20,7 +20,8 @@ ENV PHPRUN_DEPS \
 
 RUN set -e \
   && mkdir -p /var/www \
-  && adduser -u 1000 -D -h /var/www/html www-data \
+  && addgroup -g 1000 -S www-data \
+  && adduser -u 1000 -D -S -G www-data www-data \
   && apk add --no-cache \
   php5 \
   php5-fpm \
@@ -56,9 +57,7 @@ RUN set -e \
 COPY php-fpm.conf /etc/php5/
 COPY php.ini /etc/php5/conf.d/xx-drupal.ini
 
-#USER www-data
 WORKDIR /var/www/html
-#VOLUME /var/www/html
 
 EXPOSE 9000
 
