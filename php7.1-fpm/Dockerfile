@@ -87,9 +87,6 @@ RUN set -ex \
 COPY php-fpm.conf /usr/local/etc/
 COPY php.ini $PHP_INI_DIR/conf.d/xx-drupal.ini
 
-COPY skilld-php-entrypoint.sh /usr/local/bin/skilld-php-entrypoint
-ENTRYPOINT ["skilld-php-entrypoint"]
-
 WORKDIR /var/www/html
 
 CMD ["php-fpm"]
