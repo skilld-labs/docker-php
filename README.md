@@ -36,7 +36,7 @@ Local `db` directory stores mysql database files and `drupal` hold core.
       build: php7-pgsql/.
   ```
 
-### Xdebug support
+## Xdebug support
 
 You can auto enable xdebug in next PHP images:
  * skilldlabs/php:7.1-fpm
