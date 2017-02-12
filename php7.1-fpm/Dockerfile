@@ -53,11 +53,6 @@ RUN set -ex \
     zip \
   && apk del --purge freetype-dev libpng-dev libjpeg-turbo-dev \
 
-  # Add php.ini
-  && docker-php-source extract \
-  && cp /usr/src/php/php.ini-development "$PHP_INI_DIR/php.ini" \
-  && docker-php-source delete \
-
   # Install composer.
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === '55d6ead61b29c7bdee5cccfb50076874187bd9f21f65d8991d46ec5cc90518f447387fb9f76ebae1fbbacf329e583e30') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
@@ -84,8 +79,9 @@ RUN set -ex \
       /root/.composer \
       /usr/src
 
+# Add PHP config files
 COPY php-fpm.conf /usr/local/etc/
-COPY php.ini $PHP_INI_DIR/conf.d/xx-drupal.ini
+COPY php.ini $PHP_INI_DIR/
 
 WORKDIR /var/www/html
 
