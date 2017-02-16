@@ -43,10 +43,10 @@ To enable xdebug in PHP container add a `command` instruction.
 Example usage:
   ```yaml
   version: "2"
-  
+
     php:
       image: skilldlabs/php:7-fpm
       volumes:
         - ./docroot:/var/www/html
-      command: php-fpm -F -d zend_extension=xdebug.so
+      command: php-fpm7 -F -d zend_extension=xdebug.so
   ```

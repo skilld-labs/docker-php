@@ -11,7 +11,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
-# add php7-xdebug if needed
+# Add optional packages.
 ENV PHPRUN_DEPS \
   curl \
   mariadb-client \
