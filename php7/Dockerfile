@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:edge
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -19,7 +19,7 @@ ENV PHPRUN_DEPS \
   sqlite
 
 RUN set -e \
-  && apk add --no-cache \
+  && apk add --upgrade --no-cache \
   php7 \
   php7-apcu \
   php7-bcmath \
