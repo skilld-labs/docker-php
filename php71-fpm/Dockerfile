@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:edge
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -22,7 +22,8 @@ RUN set -e \
   && mkdir -p /var/www \
   && addgroup -g 1000 -S www-data \
   && adduser -u 1000 -D -S -G www-data www-data \
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  && apk add --upgrade --no-cache \
+  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
   php7.1 \
   php7.1-fpm \
 #  php7-apcu \
@@ -49,9 +50,10 @@ RUN set -e \
   $PHPRUN_DEPS \
 
 # build xdebug & apcu
-  && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  --virtual .php-build php7.1-dev php7.1-pear autoconf build-base \
-  && sed -ie 's/-n//g' /usr/bin/pecl \
+  && apk add --upgrade --no-cache \
+  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  --virtual .php-build php7.1-dev php7.1-pear pcre-dev autoconf build-base \
+#  && sed -ie 's/-n//g' /usr/bin/pecl \
   && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
   && echo 'extension=apcu.so' > /etc/php7.1/conf.d/apcu.ini \
 # clean-up
