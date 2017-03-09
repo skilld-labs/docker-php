@@ -1,3 +1,6 @@
+
+[![](https://images.microbadger.com/badges/version/skilldlabs/php.svg)](http://microbadger.com/images/skilldlabs/php "Get your own version badge on microbadger.com") https://hub.docker.com/r/skilldlabs/php/
+
 Use `run.sh` to fetch Drupal 8.1-dev and start containers.
 
 Use `docker-compose stop` to stop containers and `docker-compose rm` to clean-up.
