@@ -38,12 +38,14 @@ RUN set -e \
   php7-opcache \
   php7-openssl \
   php7-pcntl \
+  php7-pdo \
   php7-pdo_mysql \
   php7-pdo_sqlite \
   php7-phar \
   php7-session \
   php7-xdebug \
   php7-xml \
+  php7-xmlreader \
   php7-zlib \
   $PHPRUN_DEPS \
   && rm -fr /var/cache/apk/* \
