@@ -21,37 +21,37 @@ ENV PHPRUN_DEPS \
 RUN set -e \
   && apk add --upgrade --no-cache \
   --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  php7.1 \
+  php7 \
 #  php7-apcu \
-  php7.1-bcmath \
-  php7.1-ctype \
-  php7.1-curl \
-  php7.1-dom \
-  php7.1-gd \
-  php7.1-gmp \
-  php7.1-json \
-  php7.1-mbstring \
-  php7.1-mcrypt \
-  php7.1-opcache \
-  php7.1-openssl \
-  php7.1-pcntl \
-  php7.1-pdo_mysql \
-  php7.1-pdo_sqlite \
-  php7.1-phar \
-  php7.1-session \
+  php7-bcmath \
+  php7-ctype \
+  php7-curl \
+  php7-dom \
+  php7-gd \
+  php7-gmp \
+  php7-json \
+  php7-mbstring \
+  php7-mcrypt \
+  php7-opcache \
+  php7-openssl \
+  php7-pcntl \
+  php7-pdo_mysql \
+  php7-pdo_sqlite \
+  php7-phar \
+  php7-session \
 #  php7-xdebug \
-  php7.1-xml \
-  php7.1-xmlwriter \
-  php7.1-zlib \
+  php7-xml \
+  php7-xmlwriter \
+  php7-zlib \
   $PHPRUN_DEPS \
 
 # build xdebug & apcu
   && apk add --upgrade --no-cache \
   --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  --virtual .php-build php7.1-dev php7.1-pear pcre-dev autoconf build-base \
+  --virtual .php-build php7-dev php7-pear pcre-dev autoconf build-base \
 #  && sed -ie 's/-n//g' /usr/bin/pecl \
   && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
-  && echo 'extension=apcu.so' > /etc/php7.1/conf.d/apcu.ini \
+  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
 # clean-up
   && apk del --no-cache .php-build \
   && rm -rf /usr/include /usr/share/pear /tmp/pear \
@@ -66,10 +66,8 @@ RUN set -e \
   && php -r "copy('http://files.drush.org/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
-COPY php.ini /etc/php7.1/conf.d/xx-drupal.ini
+COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
 WORKDIR /srv
-
-EXPOSE 80
 
 CMD ["php", "-t", "/srv", "-S", "0.0.0.0:80"]

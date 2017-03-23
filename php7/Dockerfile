@@ -59,6 +59,4 @@ COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
 WORKDIR /srv
 
-EXPOSE 80
-
 CMD ["php", "-t", "/srv", "-S", "0.0.0.0:80"]
