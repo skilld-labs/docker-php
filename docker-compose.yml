@@ -9,6 +9,8 @@ services:
       - "8081:80"
     volumes:
       - ./drupal:/srv:Z
+      - ./scripts:/scripts
+      - ./src:/src
     links:
       - mysql:mysql
       - mailhog:mailhog
@@ -21,6 +23,11 @@ services:
     networks:
       - back
       - front
+    environment:
+      WORKFLOW: profile
+#      WORKFLOW: sql
+      DRUPAL: 8
+#      DRUPAL: 7
 
   mysql:
     image: percona:5.7

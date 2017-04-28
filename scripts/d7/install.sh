@@ -6,7 +6,9 @@
 eval $(parse_yaml docker-compose.yml)
 
 if [ "$services_web_environment_WORKFLOW" = "profile" ]; then
-  cp build/*.make.yml drupal/
-  docker-compose exec web drush make profile.make.yml --prepare-install --overwrite -y
-  rm drupal/*.make.yml
+  docker-compose exec web drush si --account-pass=admin -y
+fi;
+
+if [ "$services_web_environment_WORKFLOW" = "sql" ]; then
+  docker-compose exec web sh /scripts/d7/sql_rebuild.sh
 fi;
