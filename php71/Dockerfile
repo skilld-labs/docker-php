@@ -20,9 +20,9 @@ ENV PHPRUN_DEPS \
 
 RUN set -e \
   && apk add --upgrade --no-cache \
-  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  --repository http://nl.alpinelinux.org/alpine/edge/community \
   php7 \
-#  php7-apcu \
+  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -39,22 +39,23 @@ RUN set -e \
   php7-pdo_sqlite \
   php7-phar \
   php7-session \
-#  php7-xdebug \
+  php7-simplexml \
+  php7-xdebug \
   php7-xml \
   php7-xmlwriter \
   php7-zlib \
   $PHPRUN_DEPS \
 
 # build xdebug & apcu
-  && apk add --upgrade --no-cache \
-  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  --virtual .php-build php7-dev php7-pear pcre-dev autoconf build-base \
+#  && apk add --upgrade --no-cache \
+#  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+#  --virtual .php-build php7-dev php7-pear pcre-dev autoconf build-base \
 #  && sed -ie 's/-n//g' /usr/bin/pecl \
-  && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
-  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
+#  && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
+#  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
 # clean-up
-  && apk del --no-cache .php-build \
-  && rm -rf /usr/include /usr/share/pear /tmp/pear \
+#  && apk del --no-cache .php-build \
+#  && rm -rf /usr/include /usr/share/pear /tmp/pear \
 
   && rm -fr /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
