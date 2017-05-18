@@ -40,6 +40,7 @@ RUN set -e \
   php7-phar \
   php7-session \
   php7-simplexml \
+  php7-tokenizer \
   php7-xdebug \
   php7-xml \
   php7-xmlwriter \
