@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.6
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -20,7 +20,6 @@ ENV PHPRUN_DEPS \
 
 RUN set -e \
   && apk add --upgrade --no-cache \
-  --repository http://nl.alpinelinux.org/alpine/edge/community \
   php7 \
   php7-apcu \
   php7-bcmath \
