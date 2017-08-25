@@ -14,7 +14,9 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 ENV COMPOSER_HASH=669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410
 ENV PHPRUN_DEPS \
   curl \
+  git \
   mariadb-client \
+  openssh-client \
   patch \
   sqlite
 

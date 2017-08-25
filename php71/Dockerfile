@@ -16,6 +16,7 @@ ENV PHPRUN_DEPS \
   curl \
   git \
   mariadb-client \
+  openssh-client \
   patch \
   sqlite
 
