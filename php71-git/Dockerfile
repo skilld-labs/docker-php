@@ -10,7 +10,3 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.description="PHP Alpine for Drupal - composer & drush & git" \
   org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
   maintainer="Andy Postnikov <andypost@ya.ru>"
-
-RUN apk add --no-cache \
-  git \
-  openssh-client
