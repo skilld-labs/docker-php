@@ -30,6 +30,7 @@ RUN set -e \
   php7-dom \
   php7-gd \
   php7-gmp \
+  php7-iconv \
   php7-json \
   php7-mbstring \
   php7-mcrypt \
