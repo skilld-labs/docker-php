@@ -37,7 +37,6 @@ RUN set -e \
   php5-gmp \
   php5-iconv \
   php5-json \
-  php5-mcrypt \
   php5-opcache \
   php5-openssl \
   php5-pcntl \
