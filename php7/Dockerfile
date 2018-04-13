@@ -33,7 +33,6 @@ RUN set -e \
   php7-iconv \
   php7-json \
   php7-mbstring \
-  php7-mcrypt \
   php7-opcache \
   php7-openssl \
   php7-pcntl \
