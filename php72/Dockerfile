@@ -47,7 +47,6 @@ RUN set -e \
   php7-xmlwriter \
   php7-zlib \
   $PHPRUN_DEPS \
-
 # build xdebug & apcu
 #  && apk add --upgrade --no-cache \
 #  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -58,7 +57,6 @@ RUN set -e \
 # clean-up
 #  && apk del --no-cache .php-build \
 #  && rm -rf /usr/include /usr/share/pear /tmp/pear \
-
   && rm -fr /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
