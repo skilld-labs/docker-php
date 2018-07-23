@@ -45,7 +45,6 @@ RUN set -e \
 #  php7-xdebug \
   php7-xml \
   php7-xmlwriter \
-  php7-zlib \
   $PHPRUN_DEPS \
 # build xdebug
   && apk add --upgrade --no-cache \
