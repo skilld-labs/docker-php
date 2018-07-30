@@ -44,26 +44,26 @@ RUN set -e \
   php7-tokenizer \
   php7-xdebug \
   php7-xml \
+  php7-xmlreader \
   php7-xmlwriter \
   $PHPRUN_DEPS \
-# build xdebug & apcu
-#  && apk add --upgrade --no-cache \
+# build extra extensions
+#  && apk add --update --virtual .php-build \
 #  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#  --virtual .php-build php7-dev php7-pear pcre-dev autoconf build-base \
+#  php7-dev php7-pear make gcc g++ autoconf pcre-dev \
 #  && sed -ie 's/-n//g' /usr/bin/pecl \
 #  && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
 #  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
 # clean-up
-#  && apk del --no-cache .php-build \
-#  && rm -rf /usr/include /usr/share/pear /tmp/pear \
-  && rm -fr /var/cache/apk/* \
+#  && apk del .php-build \
+#  && rm -fr /tmp/pear /usr/include /usr/share/pear /usr/share/php7 /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
   && php -r "unlink('composer-setup.php');" \
-  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar', '/usr/bin/drush');" \
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.17/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini

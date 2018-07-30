@@ -23,7 +23,7 @@ ENV PHPRUN_DEPS \
 RUN set -e \
   && apk add --upgrade --no-cache \
   php7 \
-  php7-apcu \
+#  php7-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -41,23 +41,28 @@ RUN set -e \
   php7-pdo_sqlite \
   php7-phar \
   php7-session \
+#  php7-xdebug \
   php7-xml \
   php7-xmlreader \
   php7-zlib \
   $PHPRUN_DEPS \
-  && apk add --no-cache make gcc g++ autoconf php7-dev php7-pear --virtual .php-xdebug \
+# build extra extensions
+  && apk add --update --virtual .php-build \
+  php7-dev php7-pear make gcc g++ autoconf pcre-dev \
   && sed -ie 's/-n//g' /usr/bin/pecl \
-  && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install xdebug \
-  && apk del .php-xdebug \
-  && rm -fr /var/cache/apk/* /usr/include /usr/share/pear /tmp/pear \
+  && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
+  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
+# clean-up
+  && apk del .php-build \
+  && rm -fr /tmp/pear /usr/include /usr/share/pear /usr/share/php7 /var/cache/apk/* \
   && ln -s /usr/bin/php7 /usr/bin/php \
-  && php7 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-  && php7 -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
-  && php7 composer-setup.php \
+  && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+  && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+  && php composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
-  && php7 -r "unlink('composer-setup.php');" \
-  && php7 -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar', '/usr/bin/drush');" \
+  && php -r "unlink('composer-setup.php');" \
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.17/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini

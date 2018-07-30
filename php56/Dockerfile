@@ -42,18 +42,21 @@ RUN set -e \
   php5-xml \
   php5-zlib \
   $PHPRUN_DEPS \
-  && apk add --no-cache make gcc g++ autoconf php5-dev php5-pear --virtual .php-xdebug \
+# build extra extensions
+  && apk add --update --virtual .php-build \
+  php5-dev php5-pear make gcc g++ autoconf pcre-dev \
   && sed -ie 's/-n//g' /usr/bin/pecl \
   && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install xdebug-2.5.5 \
-  && apk del .php-xdebug \
-  && rm -fr /var/cache/apk/* /usr/include /usr/share/pear /tmp/pear \
+# clean-up
+  && apk del .php-build \
+  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
   && php -r "unlink('composer-setup.php');" \
-  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar', '/usr/bin/drush');" \
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.17/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
 COPY php.ini /etc/php5/conf.d/xx-drupal.ini

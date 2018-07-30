@@ -1,5 +1,5 @@
 NAME = skilldlabs/php
-TAGS ?= 56 56-fpm 7 7-fpm 71 71-fpm 71-fpm-dev 72 72-fpm
+TAGS ?= 56 56-fpm 7 7-fpm 71 71-fpm 72 72-fpm 72-fpm-dev
 
 .PHONY: all build push
 
