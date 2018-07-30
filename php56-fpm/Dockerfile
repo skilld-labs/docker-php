@@ -44,6 +44,7 @@ RUN set -e \
   php5-pdo_sqlite \
   php5-phar \
   php5-xml \
+  php5-xmlreader \
   php5-zlib \
   $PHPRUN_DEPS \
 # build extra extensions
