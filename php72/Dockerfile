@@ -15,6 +15,7 @@ ENV COMPOSER_HASH=93b54496392c062774670ac18b134c3b3a95e5a5e5c8f1a9f115f203b75bf9
 ENV PHPRUN_DEPS \
   curl \
   git \
+  make \
   mariadb-client \
   openssh-client \
   patch \
@@ -23,7 +24,7 @@ ENV PHPRUN_DEPS \
 RUN set -e \
   && apk add --upgrade --no-cache \
   php7 \
-  php7-apcu \
+  php7-pecl-apcu \
   php7-bcmath \
   php7-ctype \
   php7-curl \
