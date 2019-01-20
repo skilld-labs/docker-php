@@ -57,7 +57,7 @@ RUN set -e \
   --install-dir=/usr/bin \
   --filename=composer \
   && php -r "unlink('composer-setup.php');" \
-  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.17/drush.phar', '/usr/bin/drush');" \
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.18/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush
 
 COPY php.ini /etc/php5/conf.d/xx-drupal.ini
