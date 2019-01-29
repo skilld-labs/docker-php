@@ -25,6 +25,7 @@ RUN set -e \
   && apk add --upgrade --no-cache \
   php7 \
   php7-pecl-apcu \
+  php7-pecl-igbinary \
   php7-bcmath \
   php7-ctype \
   php7-curl \
