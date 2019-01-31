@@ -11,7 +11,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
-ENV COMPOSER_HASH=93b54496392c062774670ac18b134c3b3a95e5a5e5c8f1a9f115f203b75bf9a129d5daa8ba6a13e2cc8a1da0806388a8
+ENV COMPOSER_HASH=48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5
 ENV PHPRUN_DEPS \
   curl \
   git \
