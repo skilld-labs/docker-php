@@ -1,5 +1,7 @@
 FROM alpine:3.7
 
+ARG COMPOSER_HASH
+ARG DRUSH_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
@@ -11,7 +13,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
-ENV COMPOSER_HASH=48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5
 ENV PHPRUN_DEPS \
   curl \
   git \
@@ -62,8 +63,8 @@ RUN set -e \
   --install-dir=/usr/bin \
   --filename=composer \
   && php -r "unlink('composer-setup.php');" \
-  && php -r "copy('https://github.com/drush-ops/drush/releases/download/8.1.18/drush.phar', '/usr/bin/drush');" \
-  && chmod +x /usr/bin/drush
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
+  && chmod +x /usr/bin/drush && /usr/bin/drush version
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
