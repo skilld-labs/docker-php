@@ -15,8 +15,7 @@ RUN set -e \
   && mkdir -p /var/www \
   && addgroup -g 1000 -S www-data \
   && adduser -u 1000 -D -S -G www-data www-data \
-  && apk add --upgrade --no-cache \
-  --repository http://nl.alpinelinux.org/alpine/edge/community \
+  && apk add --no-cache \
   php7-fpm
 
 COPY php-fpm.conf /etc/php7/

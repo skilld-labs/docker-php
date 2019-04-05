@@ -27,6 +27,7 @@ RUN set -e \
   php7 \
   php7-pecl-apcu \
   php7-pecl-igbinary \
+  php7-pecl-xdebug \
   php7-bcmath \
   php7-ctype \
   php7-curl \
@@ -45,7 +46,6 @@ RUN set -e \
   php7-session \
   php7-simplexml \
   php7-tokenizer \
-  php7-xdebug \
   php7-xml \
   php7-xmlreader \
   php7-xmlwriter \
