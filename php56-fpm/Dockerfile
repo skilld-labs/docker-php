@@ -34,6 +34,7 @@ RUN set -e \
   php5-ctype \
   php5-curl \
   php5-dom \
+  php5-fileinfo \
   php5-gd \
   php5-gmp \
   php5-iconv \
