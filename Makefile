@@ -1,5 +1,5 @@
 NAME = skilldlabs/php
-TAGS ?= 56 56-fpm 7 7-fpm 71 71-fpm 72 72-fpm 72-fpm-dev
+TAGS ?= 56 56-fpm 7 7-fpm 71 71-fpm 72 72-fpm 73 73-fpm 73-fpm-dev
 
 COMPOSER_HASH ?= 48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5
 DRUSH_VERSION ?= 8.2.3
