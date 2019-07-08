@@ -11,4 +11,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.vcs-url="https://github.com/skilld-labs/docker-php" \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
-RUN apk add --no-cache -X http://nl.alpinelinux.org/alpine/edge/testing php7-tideways_xhprof
+RUN apk add --no-cache php7-pecl-xhprof
