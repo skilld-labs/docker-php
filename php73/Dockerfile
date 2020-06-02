@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.12
 
 ARG COMPOSER_HASH
 ARG DRUSH_VERSION
