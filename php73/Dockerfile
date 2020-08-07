@@ -50,6 +50,7 @@ RUN set -e \
   php7-xml \
   php7-xmlreader \
   php7-xmlwriter \
+  php7-zip \
   $PHPRUN_DEPS \
 # build extra extensions
 #  && apk add --update --virtual .php-build \
