@@ -55,10 +55,19 @@ RUN set -e \
 # build extra extensions
 #  && apk add --update --virtual .php-build \
 #  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-#  php7-dev php7-pear make gcc g++ autoconf pcre-dev \
+#  php7-dev php7-pear make gcc g++ autoconf \
 #  && sed -ie 's/-n//g' /usr/bin/pecl \
-#  && CFLAGS="-Os -fomit-frame-pointer -g -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -Wall -Wno-strict-aliasing" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
+#  && CFLAGS="-Os -fomit-frame-pointer -g -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -Wall -Wno-strict-aliasing"
+#  CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" \
+#  pecl install apcu igbinary xdebug \
 #  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
+  && echo 'xdebug.remote_enable = 1' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.remote_connect_back = 1' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.remote_port = 9000' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.profiler_enable = 0' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.profiler_enable_trigger = 1' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.profiler_output_dir = "/var/log"' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.profiler_output_name=cachegrind.out.%p.%r' >> /etc/php7/conf.d/50_xdebug.ini \
 # clean-up
 #  && apk del .php-build \
 #  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
