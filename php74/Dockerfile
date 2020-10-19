@@ -61,15 +61,20 @@ RUN set -e \
 #  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
 # clean-up
 #  && apk del .php-build \
-#  && rm -fr /tmp/pear /usr/include /usr/share/pear /usr/share/php7 /var/cache/apk/* \
+#  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
   --install-dir=/usr/bin \
   --filename=composer \
+  --1 \
+  && php composer-setup.php \
+  --install-dir=/usr/bin \
+  --filename=composer2 \
+  --2 \
   && php -r "unlink('composer-setup.php');" \
   && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
-  && chmod +x /usr/bin/drush && /usr/bin/drush version
+  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 
