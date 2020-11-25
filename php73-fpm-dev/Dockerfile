@@ -20,7 +20,7 @@ RUN apk add --update php7-pecl-xhprof \
 #  && sed -ie 's/-n//g' /usr/bin/pecl \
   && CFLAGS="-Os -fomit-frame-pointer -g -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fvisibility=hidden -Wall -Wno-strict-aliasing" \
   CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" \
-  pecl install xdebug-3.0.0RC1 \
+  pecl install xdebug \
   && echo ';zend_extension=xdebug.so' > /etc/php7/conf.d/50_xdebug.ini \
   && echo '; Configure mode https://3.xdebug.org/docs/all_settings#xdebug.mode' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.mode=debug' >> /etc/php7/conf.d/50_xdebug.ini \
