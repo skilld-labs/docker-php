@@ -61,12 +61,9 @@ RUN set -e \
 #  CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" \
 #  pecl install apcu igbinary xdebug \
 #  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
-  && echo 'xdebug.remote_enable = 1' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.remote_connect_back = 1' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.remote_port = 9000' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.profiler_enable = 0' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.profiler_enable_trigger = 1' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.profiler_output_dir = "/var/log"' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.mode=debug' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.discover_client_host=1' >> /etc/php7/conf.d/50_xdebug.ini \
+  && echo 'xdebug.client_port=9000' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.profiler_output_name=cachegrind.out.%p.%r' >> /etc/php7/conf.d/50_xdebug.ini \
 # clean-up
 #  && apk del .php-build \
