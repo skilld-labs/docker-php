@@ -12,7 +12,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
 RUN apk add --update php7-pecl-xhprof \
-  && apk del --purge php7-pecl-xdebug \
+  && apk del --no-network --purge php7-pecl-xdebug \
 # build extra extensions
   && apk add --virtual .php-build \
 #  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
@@ -30,5 +30,5 @@ RUN apk add --update php7-pecl-xhprof \
   && strip /usr/lib/php7/modules/xdebug.so \
   && php7 -dzend_extension=xdebug -r 'xdebug_info();' \
 # clean-up
-  && apk del .php-build \
+  && apk del --no-network .php-build \
   && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/*

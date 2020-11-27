@@ -74,7 +74,7 @@ RUN set -e \
 #  && echo ';zend_extension=xdebug' > /etc/php8/conf.d/xdebug.ini \
 #  && strip /usr/lib/php8/modules/xdebug.so \
 # clean-up
-#  && apk del .php-build \
+#  && apk del --no-network .php-build \
 #  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \

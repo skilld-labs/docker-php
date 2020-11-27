@@ -55,7 +55,7 @@ RUN set -e \
   && CFLAGS="-fstack-protector-strong -fpic -fpie -O2" CPPFLAGS="$CFLAGS" LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie" pecl install apcu xdebug \
   && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
 # clean-up
-  && apk del .php-build \
+  && apk del --no-network .php-build \
   && rm -fr /tmp/pear /usr/include /usr/share/pear /usr/share/php7 /var/cache/apk/* \
   && ln -s /usr/bin/php7 /usr/bin/php \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \

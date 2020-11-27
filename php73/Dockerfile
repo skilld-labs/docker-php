@@ -68,7 +68,7 @@ RUN set -e \
   && echo 'xdebug.profiler_enable_trigger = 1' >> /etc/php7/conf.d/xdebug.ini \
   && echo 'xdebug.profiler_output_dir = "/var/log"' >> /etc/php7/conf.d/xdebug.ini \
 # clean-up
-#  && apk del .php-build \
+#  && apk del --no-network .php-build \
 #  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
