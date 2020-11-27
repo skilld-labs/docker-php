@@ -12,7 +12,8 @@ all: build push
 build:
 	@echo "Building images for tags: $(TAGS)"
 	set -e; for i in $(TAGS); do printf "\nBuilding $(NAME):$$i \n\n"; cd php$$i; \
-		DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(NAME):$$i --no-cache \
+		DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build -t $(NAME):$$i \
+		--no-cache --progress=plain \
 		--build-arg COMPOSER_HASH=$(COMPOSER_HASH) \
 		--build-arg DRUSH_VERSION=$(DRUSH_VERSION) \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
