@@ -78,7 +78,7 @@ RUN set -e \
   --install-dir=/usr/bin \
   --filename=composer2 \
   --2 \
-  && ln -s composer1 /usr/bin/composer \
+  && ln -s composer2 /usr/bin/composer \
   && php -r "unlink('composer-setup.php');" \
   && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush
