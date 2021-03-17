@@ -63,7 +63,6 @@ RUN set -e \
 #  && echo 'extension=apcu.so' > /etc/php7/conf.d/apcu.ini \
   && echo 'xdebug.mode=debug' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.discover_client_host=1' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.client_port=9000' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.profiler_output_name=cachegrind.out.%p.%r' >> /etc/php7/conf.d/50_xdebug.ini \
 # clean-up
 #  && apk del --no-network .php-build \
