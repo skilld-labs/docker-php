@@ -27,7 +27,6 @@ RUN apk add --update php7-pecl-xhprof \
   && echo '; Configure mode https://3.xdebug.org/docs/all_settings#xdebug.mode' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.mode=debug' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.discover_client_host=1' >> /etc/php7/conf.d/50_xdebug.ini \
-  && echo 'xdebug.client_port=9000' >> /etc/php7/conf.d/50_xdebug.ini \
   && echo 'xdebug.profiler_output_name=cachegrind.out.%p.%r' >> /etc/php7/conf.d/50_xdebug.ini \
   && strip /usr/lib/php7/modules/xdebug.so \
   && php7 -dzend_extension=xdebug -r 'xdebug_info();' \
