@@ -13,8 +13,8 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 RUN set -e \
   && mkdir -p /var/www \
-  && addgroup -g 1000 -S www-data \
-  && adduser -u 1000 -D -S -G www-data www-data \
+  && addgroup -g 1000 -S www-skilld \
+  && adduser -u 1000 -D -S -G www-skilld www-data \
   && apk add --no-cache \
   php8-fpm
 
