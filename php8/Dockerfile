@@ -21,6 +21,7 @@ ENV PHPRUN_DEPS \
   openssh-client \
   patch \
   sqlite
+ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
