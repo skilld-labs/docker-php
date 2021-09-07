@@ -92,7 +92,7 @@ RUN set -e \
   && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
   && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush
 
-COPY php.ini /etc/php8/conf.d/xx-drupal.ini
+COPY php.ini /etc/php81/conf.d/xx-drupal.ini
 
 WORKDIR /srv
 
