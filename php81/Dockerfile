@@ -29,6 +29,7 @@ RUN set -e \
   php81 \
   php81-pecl-apcu \
   php81-pecl-igbinary \
+  php81-pecl-uploadprogress \
   php81-pecl-xdebug \
   php81-bcmath \
   php81-ctype \

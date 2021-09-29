@@ -29,6 +29,7 @@ RUN set -e \
   php8 \
   php8-pecl-apcu \
   php8-pecl-igbinary \
+  php8-pecl-uploadprogress \
   php8-pecl-xdebug \
   php8-bcmath \
   php8-ctype \
