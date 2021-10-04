@@ -1,7 +1,7 @@
 
 [![](https://images.microbadger.com/badges/version/skilldlabs/php.svg)](http://microbadger.com/images/skilldlabs/php "Get your own version badge on microbadger.com") https://hub.docker.com/r/skilldlabs/php/
 
-Use `run.sh` to fetch Drupal 8.1-dev and start containers.
+Use `run.sh` to fetch Drupal 9.3.dev and start containers.
 
 Use `docker-compose stop` to stop containers and `docker-compose rm` to clean-up.
 
@@ -20,14 +20,14 @@ Local `db` directory stores mysql database files and `drupal` hold core.
 
   If you want to add some packages you should:
 
-  Example of php7-pdo_pgsql
+  Example of php8-pdo_pgsql
 
   1) Create new container folder
   with own Dockerfile and extend this container from base one.
 
     ```
-    FROM skilldlabs/php:7
-    RUN apk add --no-cache php7-pdo_pgsql
+    FROM skilldlabs/php:8
+    RUN apk add --no-cache php8-pdo_pgsql
     ```
 
   2) Change build reference in docker-compose.yml file
@@ -48,8 +48,8 @@ Example usage:
   version: "2"
 
     php:
-      image: skilldlabs/php:7-fpm
+      image: skilldlabs/php:8-fpm
       volumes:
         - ./docroot:/var/www/html
-      command: php-fpm7 -F -d zend_extension=xdebug.so
+      command: php-fpm8 -F -d zend_extension=xdebug.so
   ```
