@@ -34,9 +34,9 @@ Local `db` directory stores mysql database files and `drupal` hold core.
 
   ```yaml
     web:
-      #build: php7/.
+      #build: php8/.
       # path to your custom container.
-      build: php7-pgsql/.
+      build: php8-pgsql/.
   ```
 
 #### XDebug support
