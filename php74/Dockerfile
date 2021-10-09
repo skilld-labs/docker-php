@@ -24,7 +24,8 @@ ENV PHPRUN_DEPS \
 ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
-  && apk add --upgrade --no-cache \
+  && apk --update upgrade \
+  && apk add --upgrade --virtual .drupal-build \
   php7 \
   php7-pecl-apcu \
   php7-pecl-igbinary \
@@ -67,7 +68,7 @@ RUN set -e \
   && echo 'xdebug.profiler_output_name=cachegrind.out.%p.%r' >> /etc/php7/conf.d/50_xdebug.ini \
 # clean-up
 #  && apk del --no-network .php-build \
-#  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
+#  && rm -fr /tmp/pear /usr/include /usr/share/pear \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
@@ -81,7 +82,8 @@ RUN set -e \
   && ln -s composer2 /usr/bin/composer \
   && php -r "unlink('composer-setup.php');" \
   && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
-  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush
+  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush \
+  && rm -fr /var/cache/apk/*
 
 COPY php.ini /etc/php7/conf.d/xx-drupal.ini
 

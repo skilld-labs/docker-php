@@ -24,8 +24,9 @@ ENV PHPRUN_DEPS \
 ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
+  && apk --update upgrade \
   && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
-  && apk add --upgrade --no-cache \
+  && apk add --upgrade --virtual .drupal-build \
   php8 \
   php8-pecl-apcu \
   php8-pecl-igbinary \
@@ -77,7 +78,7 @@ RUN set -e \
 #  && strip /usr/lib/php8/modules/xdebug.so \
 # clean-up
 #  && apk del --no-network .php-build \
-#  && rm -fr /tmp/pear /usr/include /usr/share/pear /var/cache/apk/* \
+#  && rm -fr /tmp/pear /usr/include /usr/share/pear \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
@@ -91,7 +92,8 @@ RUN set -e \
   && ln -s composer2 /usr/bin/composer \
   && php -r "unlink('composer-setup.php');" \
   && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
-  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush
+  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush \
+  && rm -fr /var/cache/apk/*
 
 COPY php.ini /etc/php8/conf.d/xx-drupal.ini
 
