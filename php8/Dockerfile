@@ -83,10 +83,6 @@ RUN set -e \
   && php -r "if (hash_file('SHA384', 'composer-setup.php') === getenv('COMPOSER_HASH')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
   && php composer-setup.php \
   --install-dir=/usr/bin \
-  --filename=composer1 \
-  --1 \
-  && php composer-setup.php \
-  --install-dir=/usr/bin \
   --filename=composer2 \
   --2 \
   && ln -s composer2 /usr/bin/composer \
