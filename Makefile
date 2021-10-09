@@ -23,3 +23,9 @@ build:
 push:
 	@echo "Pushing images for tags: $(TAGS)"
 	set -e; for i in $(TAGS); do printf "\nPushing $(NAME):$$i \n\n"; docker push $(NAME):$$i; done
+
+drush:
+#	docker run --rm -u $(shell id -u):$(shell id -g) -v $(CURDIR)/drush8:/srv $(NAME):81 time sh slim-drush.sh
+	docker run --rm -u $(shell id -u):$(shell id -g) -v $(CURDIR)/drush8:/srv $(NAME):81 time php -dphar.readonly=0 slim-drush.php
+	cp drush8/drush.phar php8
+	cp drush8/drush.phar php81
