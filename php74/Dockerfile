@@ -54,6 +54,7 @@ RUN set -e \
   php7-xmlwriter \
   php7-zip \
   $PHPRUN_DEPS \
+  && ln -fs php7 /usr/bin/php \
 # build extra extensions
 #  && apk add --update --virtual .php-build \
 #  --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \

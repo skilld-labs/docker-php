@@ -56,7 +56,7 @@ RUN set -e \
   php8-xmlwriter \
   php8-zip \
   $PHPRUN_DEPS \
-  && ln -s /usr/bin/php8 /usr/bin/php \
+  && ln -fs php8 /usr/bin/php \
 # build extra extensions
 #  && apk add --virtual .php-build \
 #  php8-dev php8-pear make gcc g++ \

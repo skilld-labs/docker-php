@@ -56,7 +56,7 @@ RUN set -e \
   php81-xmlwriter \
   php81-zip \
   $PHPRUN_DEPS \
-  && ln -s php81 /usr/bin/php \
+  && ln -fs php81 /usr/bin/php \
 # build extra extensions
 #  && apk add --virtual .php-build \
 #  php8-dev php8-pear make gcc g++ \
