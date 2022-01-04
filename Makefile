@@ -2,7 +2,7 @@ NAME = skilldlabs/php
 TAGS ?= 73 73-fpm 73-fpm-dev 73-fpm-extra1 74 74-fpm 74-fpm-dev 8 8-fpm 81 81-fpm
 
 COMPOSER_HASH ?= 906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8
-DRUSH_VERSION ?= 8.4.8
+DRUSH_VERSION ?= 8.4.10
 DOCKER_BUILDKIT ?= 1
 
 .PHONY: all build push
