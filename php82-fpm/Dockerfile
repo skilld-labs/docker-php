@@ -19,7 +19,7 @@ RUN set -e \
   && apk add --no-cache \
   php82-fpm
 
-COPY php-fpm.conf /etc/php81/
+COPY php-fpm.conf /etc/php82/
 
 #USER www-data
 WORKDIR /var/www/html
