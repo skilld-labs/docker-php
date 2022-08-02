@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.16
 
 ARG COMPOSER_HASH
 ARG DRUSH_VERSION
@@ -25,7 +25,7 @@ ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && apk --update upgrade \
-  && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
+#  && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade --virtual .drupal-build \
   php8 \
   php8-pecl-apcu \
