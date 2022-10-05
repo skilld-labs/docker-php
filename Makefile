@@ -23,3 +23,6 @@ build:
 push:
 	@echo "Pushing images for tags: $(TAGS)"
 	set -e; for i in $(TAGS); do printf "\nPushing $(NAME):$$i \n\n"; docker push $(NAME):$$i; done
+
+unit:
+	make -C unit-php-builder build
