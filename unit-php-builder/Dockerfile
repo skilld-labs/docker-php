@@ -2,7 +2,7 @@ ARG PHPV=8
 
 FROM alpine:edge AS builder
 ARG PHPV
-ARG UNITV=1.28.0
+ARG UNITV=1.29.0
 ENV CFLAGS="-Os -fomit-frame-pointer -D_LARGEFILE64_SOURCE"
 
 RUN apk add --no-cache --upgrade --virtual .unit_build \
@@ -11,7 +11,7 @@ RUN apk add --no-cache --upgrade --virtual .unit_build \
 
 RUN mkdir /tmp/build && cd /tmp/build && \
   wget https://unit.nginx.org/download/unit-${UNITV}.tar.gz && tar -xzf unit-${UNITV}.tar.gz && \
-  cd unit-${UNITV} && wget -O- https://github.com/nginx/unit/pull/713.patch | patch -p1 && \
+  cd unit-${UNITV} && \
   ./configure \
     --prefix="/usr" \
     --state="/var/lib/unit" \
