@@ -18,6 +18,7 @@ RUN mkdir /tmp/build && cd /tmp/build && \
     --control="unix:/run/control.unit.sock" \
     --pid="/run/unit.pid" \
     --log="/var/log/unit.log" \
+    --tmp=/tmp \
     --modules="/usr/lib/unit/modules" \
     --openssl \
   && \
