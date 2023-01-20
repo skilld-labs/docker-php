@@ -17,7 +17,7 @@ RUN mkdir /tmp/build && cd /tmp/build && \
     --state="/var/lib/unit" \
     --control="unix:/run/control.unit.sock" \
     --pid="/run/unit.pid" \
-    --log="/var/log/unit.log" \
+    --log="/dev/stdout" \
     --tmp=/tmp \
     --modules="/usr/lib/unit/modules" \
     --openssl \
