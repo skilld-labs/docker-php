@@ -26,7 +26,7 @@ ENV PHP_CLI_SERVER_WORKERS 4
 RUN set -e \
   && apk --update upgrade \
   && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
-  && apk add --upgrade --virtual .drupal-build \
+  && apk add --upgrade \
   php81 \
   php81-pecl-apcu \
   php81-pecl-igbinary \
@@ -40,7 +40,6 @@ RUN set -e \
   php81-gd \
   php81-gmp \
   php81-iconv \
-#  php81-json \
   php81-mbstring \
   php81-opcache \
   php81-openssl \
