@@ -25,7 +25,6 @@ ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && apk --update upgrade \
-  && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade --virtual .drupal-build \
   php7 \
   php7-pecl-apcu \
