@@ -27,4 +27,4 @@ push:
 	set -e; for i in $(TAGS); do printf "\nPushing $(NAME):$$i \n\n"; docker push $(NAME):$$i; done
 
 unit:
-	make -C unit-php-builder build
+	make -C unit-php-builder/dev build
