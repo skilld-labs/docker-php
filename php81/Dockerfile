@@ -25,7 +25,7 @@ ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && apk --update upgrade \
-  && echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
+  && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \
   php81 \
   php81-pecl-apcu \
