@@ -14,4 +14,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
 RUN set -e && \
-  apk add --no-cache nodejs yarn
+  apk add --no-cache nodejs yarn bash ncurses
