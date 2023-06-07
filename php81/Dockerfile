@@ -20,6 +20,7 @@ ENV PHPRUN_DEPS \
   mariadb-client \
   openssh-client \
   patch \
+  rsync \
   sqlite
 ENV PHP_CLI_SERVER_WORKERS 4
 
