@@ -1,5 +1,5 @@
 NAME = skilldlabs/php
-TAGS ?= 8
+TAGS ?= 8 83
 
 DOCKER_BUILDKIT ?= 1
 
