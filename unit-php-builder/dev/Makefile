@@ -1,5 +1,5 @@
 NAME = skilldlabs/php
-TAGS ?= 81 82
+TAGS ?= 81 82 83
 
 DOCKER_BUILDKIT ?= 1
 PLATFORM ?= linux/amd64
