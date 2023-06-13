@@ -29,6 +29,7 @@ RUN set -e \
   && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \
   php8 \
+  php8-brotli \
   php8-pecl-apcu \
   php8-pecl-igbinary \
   php8-pecl-uploadprogress \
