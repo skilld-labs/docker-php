@@ -2,7 +2,7 @@ ARG PHPV=8
 
 FROM alpine:edge AS builder
 ARG PHPV
-ARG UNITV=1.30.0
+ARG UNITV=1.31.0
 ENV CFLAGS="-Os -fomit-frame-pointer -D_LARGEFILE64_SOURCE"
 
 RUN apk add --no-cache --upgrade --virtual .unit_build \
@@ -12,7 +12,8 @@ RUN apk add --no-cache --upgrade --virtual .unit_build \
 RUN mkdir /tmp/build && cd /tmp/build && \
   wget https://unit.nginx.org/download/unit-${UNITV}.tar.gz && tar -xzf unit-${UNITV}.tar.gz && \
   cd unit-${UNITV} && \
-  sed -i 's/NXT_PHP_MAJOR_VERSION -ge 8/NXT_PHP_MAJOR_VERSION -lt 8/' auto/modules/php && \
+#  sed -i 's/NXT_PHP_MAJOR_VERSION -ge 8/NXT_PHP_MAJOR_VERSION -lt 8/' auto/modules/php && \
+  sed -i "s/lphp/lphp${PHPV}/" auto/modules/php && \
   ./configure \
     --prefix="/usr" \
     --statedir="/var/lib/unit" \
