@@ -7,7 +7,7 @@ ENV CFLAGS="-Os -fomit-frame-pointer -D_LARGEFILE64_SOURCE"
 
 RUN apk add --no-cache --upgrade --virtual .unit_build \
     -X https://dl-cdn.alpinelinux.org/alpine/edge/testing \
-    gcc openssl-dev make musl-dev patch php${PHPV}-dev php${PHPV}-embed
+    gcc openssl-dev make musl-dev linux-headers patch php${PHPV}-dev php${PHPV}-embed
 
 RUN mkdir /tmp/build && cd /tmp/build && \
   wget https://unit.nginx.org/download/unit-${UNITV}.tar.gz && tar -xzf unit-${UNITV}.tar.gz && \
