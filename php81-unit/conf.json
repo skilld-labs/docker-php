@@ -1,87 +1,150 @@
 {
   "listeners": {
     "*:80": {
-      "pass": "routes"
+      "pass": "routes/drupal"
     }
   },
-  "routes": [
-    {
-      "match": {
-        "uri": [
-          "!*/.well-known/*",
-          "/vendor/*",
-          "/core/profiles/demo_umami/modules/demo_umami_content/default_content/*",
-          "*.engine",
-          "*.inc",
-          "*.install",
-          "*.make",
-          "*.module",
-          "*.po",
-          "*.profile",
-          "*.sh",
-          "*.theme",
-          "*.tpl",
-          "*.twig",
-          "*.xtmpl",
-          "*.yml",
-          "*/.*",
-          "*/Entries*",
-          "*/Repository",
-          "*/Root",
-          "*/Tag",
-          "*/Template",
-          "*/composer.json",
-          "*/composer.lock",
-          "*/web.config",
-          "*sql",
-          "*.bak",
-          "*.orig",
-          "*.save",
-          "*.swo",
-          "*.swp",
-          "*~"
-        ]
+  "routes": {
+    "drupal": [
+      {
+        "match": {
+          "uri": [
+            "!*/.well-known/*",
+            "/vendor/*",
+            "/core/profiles/demo_umami/modules/demo_umami_content/default_content/*",
+            "*.engine",
+            "*.inc",
+            "*.install",
+            "*.make",
+            "*.module",
+            "*.po",
+            "*.profile",
+            "*.sh",
+            "*.theme",
+            "*.tpl",
+            "*.twig",
+            "*.xtmpl",
+            "*.yml",
+            "*/.*",
+            "*/Entries*",
+            "*/Repository",
+            "*/Root",
+            "*/Tag",
+            "*/Template",
+            "*/composer.json",
+            "*/composer.lock",
+            "*/web.config",
+            "*sql",
+            "*.bak",
+            "*.orig",
+            "*.save",
+            "*.swo",
+            "*.swp",
+            "*~"
+          ]
+        },
+        "action": {
+          "return": 404
+        }
       },
-      "action": {
-        "return": 404
-      }
-    },
-    {
-      "match": {
-        "uri": [
-          "/core/authorize.php",
-          "/core/install.php",
-          "/core/modules/statistics/statistics.php",
-          "~^/core/modules/system/tests/https?\\.php",
-          "/core/rebuild.php",
-          "/update.php",
-          "/update.php/*"
-        ]
+      {
+        "match": {
+          "uri": [
+            "/core/authorize.php",
+            "/core/install.php",
+            "/core/modules/statistics/statistics.php",
+            "~^/core/modules/system/tests/https?\\.php",
+            "/core/rebuild.php",
+            "/update.php",
+            "/update.php/*"
+          ]
+        },
+        "action": {
+          "pass": "applications/drupal/direct"
+        }
       },
-      "action": {
-        "pass": "applications/drupal/direct"
-      }
-    },
-    {
-      "match": {
-        "uri": [
-          "!/index.php*",
-          "*.php"
-        ]
+      {
+        "match": {
+          "uri": [
+            "!/index.php*",
+            "*.php"
+          ]
+        },
+        "action": {
+          "return": 405
+        }
       },
-      "action": {
-        "return": 404
-      }
-    },
-    {
-      "action": {
-        "share": "/var/www/html/web$uri",
-        "fallback": {
-          "pass": "applications/drupal/index"
+      {
+        "match": {
+          "uri": [
+            "*.css",
+            "*.js"
+          ]
+        },
+        "action": {
+          "pass": "routes/assets_brotli"
+        }
+      },
+      {
+        "action": {
+          "share": "/var/www/html/web$uri",
+          "fallback": {
+            "pass": "applications/drupal/index"
+          }
         }
       }
-    }
-  ],
+    ],
+    "assets_brotli": [
+      {
+        "match": {
+          "headers": [
+            {
+              "Accept-Encoding": "*br*"
+            }
+          ]
+        },
+        "action": {
+          "share": "/var/www/html/web$uri.br",
+          "fallback": {
+            "pass": "routes/assets_gzip"
+          }
+        }
+      },
+      {
+        "action": {
+          "pass": "routes/assets_gzip"
+        }
+      }
+    ],
+    "assets_gzip": [
+      {
+        "match": {
+          "headers": [
+            {
+              "Accept-Encoding": "*gzip*"
+            }
+          ]
+        },
+        "action": {
+          "share": [
+            "/var/www/html/web$uri.gz",
+            "/var/www/html/web$uri"
+          ],
+          "fallback": {
+            "return": 404
+          }
+        }
+      },
+      {
+        "action": {
+          "share": "/var/www/html/web$uri",
+          "fallback": {
+            "return": 404
+          }
+        }
+      }
+    ]
+  },
   "applications": {
     "drupal": {
       "type": "php",
