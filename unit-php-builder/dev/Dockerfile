@@ -1,4 +1,4 @@
-ARG PHPV=81
+ARG PHPV=82
 
 FROM skilldlabs/php:${PHPV}-unit
 
