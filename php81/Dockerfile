@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:3.19
 
 ARG COMPOSER_HASH
 ARG DRUSH_VERSION
@@ -26,7 +26,6 @@ ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && apk --update upgrade \
-  && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \
   php81 \
   php81-brotli \
