@@ -26,4 +26,4 @@ RUN set -e && \
   addgroup -g 1000 -S web-group && \
   adduser -u 1000 -D -S -G web-group web-user
 
-CMD ["unitd", "--no-daemon", "--user", "web-user", "--group", "web-group"]
+CMD ["unitd", "--no-daemon", "--user", "web-user", "--group", "web-group", "--log", "/dev/stdout"]
