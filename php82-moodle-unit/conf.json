@@ -1,0 +1,74 @@
+{
+  "access_log": "/dev/stdout",
+  "listeners": {
+    "*:80": {
+      "pass": "routes/main"
+    }
+  },
+  "routes": {
+    "main": [
+      {
+        "match": {
+          "uri": [ "/data/*" ]
+         },
+         "action": {
+           "pass": "routes/data"
+          }
+      },
+      {
+        "match": {
+          "uri": [
+            "*.php*",
+            "/",
+            "*/"
+          ]
+        },
+        "action": {
+          "pass": "applications/moodle"
+        }
+      },
+      {
+        "action": {
+          "share": "/var/www/html/web${uri}",
+          "fallback": {
+            "return": 404
+          }
+        }
+      }
+    ],
+    "data": [
+      {
+        "action": {
+          "share": "/var/www/html/data${uri}",
+          "fallback": {
+            "return": 404
+          }
+        }
+      }
+    ]
+  },
+  "applications": {
+    "moodle": {
+      "type": "php",
+      "stdout": "/dev/stdout",
+      "stderr": "/dev/stderr",
+      "processes": {
+        "max": 4,
+        "spare": 2,
+        "idle_timeout": 120
+      },
+      "limits": {
+        "timeout": 300,
+        "requests": 1500
+      },
+      "options": {
+        "admin": {
+          "max_input_vars": "10000",
+          "memory_limit": "1G",
+          "opcache.jit_buffer_size": "20M"
+        }
+      },
+      "root": "/var/www/html/web/"
+    }
+  }
+}
