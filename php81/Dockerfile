@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:edge
 
 ARG COMPOSER_HASH
 ARG DRUSH_VERSION
@@ -22,7 +22,6 @@ ENV PHPRUN_DEPS \
   patch \
   rsync \
   sqlite
-ENV PHP_CLI_SERVER_WORKERS 4
 
 RUN set -e \
   && apk --update upgrade \
