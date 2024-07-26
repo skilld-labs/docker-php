@@ -82,7 +82,6 @@ COPY conf.json /var/lib/unit/
 COPY xx-moodle.ini /etc/php83/conf.d/xx-moodle.ini
 
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 EXPOSE 80
 

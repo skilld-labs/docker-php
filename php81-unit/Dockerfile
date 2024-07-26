@@ -16,7 +16,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 COPY conf.json /var/lib/unit/
 
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 EXPOSE 80
 

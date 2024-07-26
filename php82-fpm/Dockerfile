@@ -23,7 +23,6 @@ COPY php-fpm.conf /etc/php82/
 
 #USER www-data
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 EXPOSE 9000
 

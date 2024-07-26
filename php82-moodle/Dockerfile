@@ -88,7 +88,6 @@ COPY xx-moodle.ini /etc/php82/conf.d/xx-moodle.ini
 
 #USER web-user
 WORKDIR /var/www/html
-VOLUME /var/www/html
 
 EXPOSE 9000
 
