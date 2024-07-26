@@ -25,6 +25,7 @@ ENV PHPRUN_DEPS \
 
 RUN set -e \
   && apk --update upgrade \
+  && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \
   php81 \
   php81-brotli \
