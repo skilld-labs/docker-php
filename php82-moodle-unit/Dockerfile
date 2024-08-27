@@ -84,7 +84,7 @@ COPY xx-moodle.ini /etc/php82/conf.d/xx-moodle.ini
 COPY cron.sh /usr/local/bin/cron.sh
 COPY crontab /etc/crontabs/root
 
-COPY s6-services /etc/services.d/
+COPY services /etc/services.d/
 
 WORKDIR /var/www/html
 
