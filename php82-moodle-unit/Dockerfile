@@ -83,14 +83,7 @@ COPY conf.json /var/lib/unit/
 
 COPY xx-moodle.ini /etc/php82/conf.d/xx-moodle.ini
 
-# S6 & cron management
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
-RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
-ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
-RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
-
 COPY cron.sh /usr/local/bin/cron.sh
-RUN chmod +x /usr/local/bin/cron.sh
 COPY crontab /etc/crontabs/root
 
 COPY s6-services /etc/services.d/
