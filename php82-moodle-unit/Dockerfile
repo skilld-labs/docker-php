@@ -1,9 +1,10 @@
 FROM alpine:edge
 
-ENV COMPOSER_HASH dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6
+ARG S6_OVERLAY_VERSION=3.2.0.0
 
-ENV PHPRUN_DEPS \
-  curl \
+ENV COMPOSER_HASH=dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6
+
+ENV PHPRUN_DEPS="curl \
   git \
   libxml2-utils \
   libxslt \
@@ -14,7 +15,7 @@ ENV PHPRUN_DEPS \
   patch \
   rsync \
   sqlite \
-  wget
+  wget"
 
 RUN set -e \
   && apk --update upgrade \
@@ -60,6 +61,7 @@ RUN set -e \
   php82-xmlreader \
   php82-xmlwriter \
   php82-zip \
+  s6-overlay \
   unit-php82 \
   $PHPRUN_DEPS \
   && ln -fs php82 /usr/bin/php \
@@ -81,8 +83,20 @@ COPY conf.json /var/lib/unit/
 
 COPY xx-moodle.ini /etc/php82/conf.d/xx-moodle.ini
 
+# S6 & cron management
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
+
+COPY cron.sh /usr/local/bin/cron.sh
+RUN chmod +x /usr/local/bin/cron.sh
+COPY crontab /etc/crontabs/root
+
+COPY s6-services /etc/services.d/
+
 WORKDIR /var/www/html
 
 EXPOSE 80
 
-CMD ["unitd", "--no-daemon", "--user", "web-user", "--group", "web-group", "--log", "/dev/stdout"]
+ENTRYPOINT ["/init"]
