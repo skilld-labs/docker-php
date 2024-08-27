@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec unitd --no-daemon --user web-user --group web-group --log /dev/stdout
