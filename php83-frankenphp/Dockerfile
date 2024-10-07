@@ -3,8 +3,9 @@
 ######
 ARG THE_BASE_IMAGE=ubuntu:noble
 
-ARG PHP_VERSION=8.3.11
-ARG PHP_SHA256_HASH="b862b098a08ab9bf4b36ed12c7d0d9f65353656b36fb0e3c5344093aceb35802"
+ARG PHP_FRA=8.3
+ARG PHP_VERSION=8.3.12
+ARG PHP_SHA256_HASH="f774e28633e26fc8c5197f4dae58ec9e3ff87d1b4311cbc61ab05a7ad24bd131"
 
 ARG PHPIZE_DEPS="autoconf file g++ gcc make pkg-config re2c"
 
@@ -17,7 +18,7 @@ ARG PHPIZE_DEPS="autoconf file g++ gcc make pkg-config re2c"
 ARG PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 ARG PHP_LDFLAGS="-Wl,-O1 -pie"
 
-FROM docker.io/dunglas/frankenphp:1-php${PHP_VERSION} AS frankenphp
+FROM docker.io/dunglas/frankenphp:1-php${PHP_FRA} AS frankenphp
 
 FROM ${THE_BASE_IMAGE} AS builder
 ENV TERM=xterm DEBIAN_FRONTEND=noninteractive
