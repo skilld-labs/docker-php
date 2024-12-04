@@ -4,8 +4,8 @@
 ARG THE_BASE_IMAGE=ubuntu:noble
 
 ARG PHP_FRA=8.3
-ARG PHP_VERSION=8.3.13
-ARG PHP_SHA256_HASH="89adb978cca209124fe53fd6327bc4966ca21213a7fa2e9504f854e340873018"
+ARG PHP_VERSION=8.3.14
+ARG PHP_SHA256_HASH="58b4cb9019bf70c0cbcdb814c7df79b9065059d14cf7dbf48d971f8e56ae9be7"
 
 ARG PHPIZE_DEPS="autoconf file g++ gcc make pkg-config re2c"
 
@@ -148,13 +148,13 @@ RUN set -xe &&\
 
 # install pecl extensions
 RUN pecl channel-update pecl.php.net &&\
-    pecl install APCu-5.1.23 \
+    pecl install APCu-5.1.24 \
         brotli \
         igbinary \
         msgpack \
         redis \
         uploadprogress \
-        xdebug-3.3.2 \
+        xdebug-3.4.0 \
         yaml-2.2.3 \
     &&\
     docker-php-ext-enable --ini-name 50_brotli.ini brotli &&\
@@ -179,6 +179,7 @@ RUN pecl channel-update pecl.php.net &&\
 COPY ./conf/php.ini /usr/local/etc/php/conf.d/xx-drupal.ini
 
 COPY --from=frankenphp /usr/local/bin/frankenphp /usr/local/bin/
+COPY --from=frankenphp /usr/local/lib/libwatcher* /usr/local/lib/
 
 
 #########
@@ -236,7 +237,7 @@ RUN curl -sSLo /tmp/composer-setup.php https://getcomposer.org/installer &&\
     curl -sSLo /tmp/composer-setup.sig https://composer.github.io/installer.sig &&\
     php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" &&\
     php /tmp/composer-setup.php --filename composer --install-dir /usr/local/bin &&\
-    curl -sSLo /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.3.5/drush.phar &&\
+    curl -sSLo /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.5.0/drush.phar &&\
     chmod +x /usr/local/bin/drush &&\
     /usr/local/bin/drush --version
 
