@@ -152,8 +152,7 @@
 
 			"options": {
 				"admin": {
-					"memory_limit": "1G",
-					"opcache.jit_buffer_size": "20M"
+					"memory_limit": "1G"
 				}
 			},
 
