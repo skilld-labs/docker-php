@@ -1,9 +1,8 @@
 FROM alpine:edge
 
-ENV COMPOSER_HASH dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6
+ENV COMPOSER_HASH=dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6
 
-ENV PHPRUN_DEPS \
-  curl \
+ENV PHPRUN_DEPS="curl \
   git \
   libxml2-utils \
   libxslt \
@@ -13,8 +12,9 @@ ENV PHPRUN_DEPS \
   openssh-client \
   patch \
   rsync \
+  s6-overlay \
   sqlite \
-  wget
+  wget"
 
 RUN set -e \
   && apk --update upgrade \
@@ -81,8 +81,13 @@ COPY conf.json /var/lib/unit/
 
 COPY xx-moodle.ini /etc/php83/conf.d/xx-moodle.ini
 
+COPY cron.sh /usr/local/bin/cron.sh
+COPY crontab /etc/crontabs/root
+
+COPY services /etc/services.d/
+
 WORKDIR /var/www/html
 
 EXPOSE 80
 
-CMD ["unitd", "--no-daemon", "--user", "web-user", "--group", "web-group", "--log", "/dev/stdout"]
+ENTRYPOINT ["/init"]
