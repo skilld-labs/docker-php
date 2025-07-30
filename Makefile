@@ -32,3 +32,16 @@ unit:
 prepare:
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 	docker buildx create --use
+
+tag: VER ?= 0
+tag:
+	@$(if $(filter $(VER),0),echo "define version VER for TAGS='$(TAGS)'"; exit 1)
+	@echo "Tagging images $(VER) for tags: $(TAGS)"
+	set -e; for i in $(TAGS); do \
+		[ $${#i} -eq 2 ] && tag=$(VER) || tag="$$i-$(VER)"; \
+		printf "\nTagging $(NAME):$$i as $$tag\n"; \
+		docker pull $(NAME):$$i; \
+		docker tag $(NAME):$$i $(NAME):$$tag; \
+		docker push $(NAME):$$tag; \
+		docker rmi $(NAME):$$tag $(NAME):$$i; \
+	done
