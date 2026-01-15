@@ -14,5 +14,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   maintainer="Andy Postnikov <andypost@ya.ru>"
 
 RUN set -e && \
-  apk add --no-cache nodejs-current yarn bash ncurses && \
-  corepack enable
+  apk add --no-cache nodejs-current yarn bash ncurses
