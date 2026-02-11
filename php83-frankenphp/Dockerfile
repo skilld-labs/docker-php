@@ -4,8 +4,8 @@
 ARG THE_BASE_IMAGE=ubuntu:noble
 
 ARG PHP_FRA=8.3
-ARG PHP_VERSION=8.3.26
-ARG PHP_SHA256_HASH="2f522eefa02c400c94610d07f25c4fd4c771f95e4a1f55102332ccb40663cbd2"
+ARG PHP_VERSION=8.3.30
+ARG PHP_SHA256_HASH="67f084d36852daab6809561a7c8023d130ca07fc6af8fb040684dd1414934d48"
 
 ARG PHPIZE_DEPS="autoconf file g++ gcc make pkg-config re2c"
 
@@ -148,14 +148,14 @@ RUN set -xe &&\
 
 # install pecl extensions
 RUN pecl channel-update pecl.php.net &&\
-    pecl install APCu-5.1.24 \
+    pecl install APCu-5.1.28 \
         brotli \
         igbinary \
         msgpack \
         redis \
         uploadprogress \
-        xdebug-3.4.0 \
-        yaml-2.2.3 \
+        xdebug-3.5.1 \
+        yaml-2.3.0 \
     &&\
     docker-php-ext-enable --ini-name 50_brotli.ini brotli &&\
     docker-php-ext-enable --ini-name 10_igbinary.ini igbinary &&\
