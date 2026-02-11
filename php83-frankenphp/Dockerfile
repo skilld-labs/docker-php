@@ -188,6 +188,7 @@ COPY --from=frankenphp /usr/local/lib/libwatcher* /usr/local/lib/
 
 FROM ${THE_BASE_IMAGE}
 ENV TERM=xterm DEBIAN_FRONTEND=noninteractive
+ARG DRUSH_VERSION
 
 COPY --from=builder /usr/local /usr/local
 
@@ -237,7 +238,7 @@ RUN curl -sSLo /tmp/composer-setup.php https://getcomposer.org/installer &&\
     curl -sSLo /tmp/composer-setup.sig https://composer.github.io/installer.sig &&\
     php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" &&\
     php /tmp/composer-setup.php --filename composer --install-dir /usr/local/bin &&\
-    curl -sSLo /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.5.0/drush.phar &&\
+    curl -sSLo /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/${DRUSH_VERSION}/drush.phar &&\
     chmod +x /usr/local/bin/drush &&\
     /usr/local/bin/drush --version
 

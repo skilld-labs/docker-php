@@ -2,7 +2,7 @@ NAME = skilldlabs/php
 TAGS ?= 81 81-fpm 81-unit 82 82-fpm 82-unit 83 83-fpm 83-unit 84 84-fpm 84-unit
 
 COMPOSER_HASH ?= c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47
-DRUSH_VERSION ?= 8.4.12
+DRUSH_VERSION ?= 8.5.0
 DOCKER_BUILDKIT ?= 1
 PLATFORM ?= linux/amd64,linux/arm64
 

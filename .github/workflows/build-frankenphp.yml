@@ -1,0 +1,39 @@
+name: Build and Push FrankenPHP Images
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: skilldlabs/php
+  DRUSH_VERSION: "8.5.0"
+  PLATFORMS: "linux/amd64,linux/arm64"
+
+jobs:
+  build-frankenphp:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: ["85-frankenphp"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: php${{ matrix.tag }}
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          no-cache: true
+          tags: ${{ env.REGISTRY }}:${{ matrix.tag }}
+          build-args: |
+            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}

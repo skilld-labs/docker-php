@@ -24,6 +24,7 @@ ENV PHPRUN_DEPS \
   sqlite
 
 RUN set -e \
+  && apk add '!usr-merge-nag' \
   && apk --update upgrade \
   && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \
@@ -88,11 +89,9 @@ RUN set -e \
   --2 \
   && ln -s composer2 /usr/bin/composer \
   && php -r "unlink('composer-setup.php');" \
-#  && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
-#  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush \
+  && php -r "copy('https://github.com/drush-ops/drush/releases/download/$DRUSH_VERSION/drush.phar', '/usr/bin/drush');" \
+  && chmod +x /usr/bin/drush && /usr/bin/drush version && rm -fr /root/.drush \
   && rm -fr /var/cache/apk/*
-
-COPY --chmod=0755 drush.phar /usr/bin/drush
 
 COPY php.ini /etc/php84/conf.d/xx-drupal.ini
 

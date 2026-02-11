@@ -17,7 +17,8 @@ ENV PHPRUN_DEPS \
   wget
 
 RUN set -e \
-  && apk --update upgrade \
+  && apk add '!usr-merge-nag' \
+#  && apk --update upgrade \
   && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && mkdir -p /var/www/html/web \
   && addgroup -g 1000 -S web-group \
