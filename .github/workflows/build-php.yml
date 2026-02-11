@@ -1,20 +1,35 @@
-name: Build and Push PHP Images
+name: Build PHP Images (reusable)
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      php:
+        description: "PHP version short code (e.g. 83, 84, 85)"
+        required: true
+        type: string
+      version:
+        description: "Version tag (e.g. 8.5.3). Leave empty to skip."
+        required: false
+        type: string
+      platforms:
+        description: "Target platforms"
+        required: false
+        type: string
+        default: "linux/amd64,linux/arm64"
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
 
 env:
   REGISTRY: skilldlabs/php
   COMPOSER_HASH: "c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47"
   DRUSH_VERSION: "8.5.0"
-  PLATFORMS: "linux/amd64,linux/arm64"
 
 jobs:
   build-base:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tag: ["84", "85"]
     steps:
       - uses: actions/checkout@v4
 
@@ -27,13 +42,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Generate tags
+        id: tags
+        run: |
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}"
+          if [ -n "${{ inputs.version }}" ]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.version }}"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - uses: docker/build-push-action@v6
         with:
-          context: php${{ matrix.tag }}
-          platforms: ${{ env.PLATFORMS }}
+          context: php${{ inputs.php }}
+          platforms: ${{ inputs.platforms }}
           push: true
           no-cache: true
-          tags: ${{ env.REGISTRY }}:${{ matrix.tag }}
+          tags: ${{ steps.tags.outputs.tags }}
           build-args: |
             COMPOSER_HASH=${{ env.COMPOSER_HASH }}
             DRUSH_VERSION=${{ env.DRUSH_VERSION }}
@@ -43,9 +67,6 @@ jobs:
   build-fpm:
     needs: build-base
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tag: ["84-fpm", "85-fpm"]
     steps:
       - uses: actions/checkout@v4
 
@@ -58,13 +79,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Generate tags
+        id: tags
+        run: |
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-fpm"
+          if [ -n "${{ inputs.version }}" ]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-fpm-${{ inputs.version }}"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - uses: docker/build-push-action@v6
         with:
-          context: php${{ matrix.tag }}
-          platforms: ${{ env.PLATFORMS }}
+          context: php${{ inputs.php }}-fpm
+          platforms: ${{ inputs.platforms }}
           push: true
           no-cache: true
-          tags: ${{ env.REGISTRY }}:${{ matrix.tag }}
+          tags: ${{ steps.tags.outputs.tags }}
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
@@ -72,9 +102,6 @@ jobs:
   build-unit:
     needs: build-base
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        tag: ["84-unit", "85-unit"]
     steps:
       - uses: actions/checkout@v4
 
@@ -87,13 +114,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Generate tags
+        id: tags
+        run: |
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-unit"
+          if [ -n "${{ inputs.version }}" ]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-${{ inputs.version }}"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - uses: docker/build-push-action@v6
         with:
-          context: php${{ matrix.tag }}
-          platforms: ${{ env.PLATFORMS }}
+          context: php${{ inputs.php }}-unit
+          platforms: ${{ inputs.platforms }}
           push: true
           no-cache: true
-          tags: ${{ env.REGISTRY }}:${{ matrix.tag }}
+          tags: ${{ steps.tags.outputs.tags }}
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
@@ -101,9 +137,6 @@ jobs:
   build-unit-dev:
     needs: build-unit
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ver: ["84", "85"]
     steps:
       - uses: actions/checkout@v4
 
@@ -116,14 +149,23 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Generate tags
+        id: tags
+        run: |
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev"
+          if [ -n "${{ inputs.version }}" ]; then
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev-${{ inputs.version }}"
+          fi
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+
       - uses: docker/build-push-action@v6
         with:
           context: unit-php-builder/dev
-          platforms: ${{ env.PLATFORMS }}
+          platforms: ${{ inputs.platforms }}
           push: true
           no-cache: true
-          tags: ${{ env.REGISTRY }}:${{ matrix.ver }}-unit-dev
+          tags: ${{ steps.tags.outputs.tags }}
           build-args: |
-            PHPV=${{ matrix.ver }}
+            PHPV=${{ inputs.php }}
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
