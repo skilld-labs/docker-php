@@ -152,11 +152,7 @@ jobs:
       - name: Generate tags
         id: tags
         run: |
-          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev"
-          if [ -n "${{ inputs.version }}" ]; then
-            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev-${{ inputs.version }}"
-          fi
-          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "tags=${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v6
         with:
