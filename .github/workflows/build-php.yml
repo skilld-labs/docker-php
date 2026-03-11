@@ -33,21 +33,14 @@ env:
   DRUSH_VERSION: "8.5.0"
 
 jobs:
-  # Setup cache and build all variants in parallel
-  # Each job: build test image (amd64) → test → build all platforms → push
   build-base:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.tags.outputs.base_tag }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-qemu-action@v3
-
       - uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-            network=host
-
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -63,30 +56,21 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}" >> "$GITHUB_OUTPUT"
 
-      # Restore cache to speed up builds
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - uses: docker/build-push-action@v6
+        id: build
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-
-            ${{ runner.os }}-buildx-
-
-      - name: Build and test base image (amd64 only)
-        run: |
-          # Build with cache, load for testing
-          docker buildx build \
-            -t ${{ steps.tags.outputs.base_tag }} \
-            --platform linux/amd64 \
-            --load \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
-            --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}
+          context: php${{ inputs.php }}
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            COMPOSER_HASH=${{ env.COMPOSER_HASH }}
+            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
       - name: Test base image
         if: ${{ !inputs.skip_tests }}
@@ -94,41 +78,27 @@ jobs:
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-base.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push base image (all platforms)
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.tags }} \
-            --platform ${{ inputs.platforms }} \
-            --push \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
-            --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}
-
-      # This runs in background to move cache after completion
-      - name: Move cache
-        if: always()
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+      - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            COMPOSER_HASH=${{ env.COMPOSER_HASH }}
+            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
   build-fpm:
     needs: build-base
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-qemu-action@v3
-
       - uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-            network=host
-
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -144,27 +114,19 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-fpm" >> "$GITHUB_OUTPUT"
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - uses: docker/build-push-action@v6
+        id: build
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-
-            ${{ runner.os }}-buildx-
-
-      - name: Build and test FPM image (amd64 only)
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.base_tag }} \
-            --platform linux/amd64 \
-            --load \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}-fpm
+          context: php${{ inputs.php }}-fpm
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
       - name: Test FPM image
         if: ${{ !inputs.skip_tests }}
@@ -172,38 +134,25 @@ jobs:
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-fpm.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push FPM image (all platforms)
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.tags }} \
-            --platform ${{ inputs.platforms }} \
-            --push \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}-fpm
-
-      - name: Move cache
-        if: always()
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+      - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}-fpm
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
   build-unit:
     needs: build-base
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-qemu-action@v3
-
       - uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-            network=host
-
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -219,27 +168,19 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-unit" >> "$GITHUB_OUTPUT"
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - uses: docker/build-push-action@v6
+        id: build
         with:
-          path: ${{ env.CACHE_PATH }}
-          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-
-            ${{ runner.os }}-buildx-
-
-      - name: Build and test Unit image (amd64 only)
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.base_tag }} \
-            --platform linux/amd64 \
-            --load \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}-unit
+          context: php${{ inputs.php }}-unit
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
       - name: Test Unit image
         if: ${{ !inputs.skip_tests }}
@@ -247,38 +188,25 @@ jobs:
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-unit.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push Unit image (all platforms)
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.tags }} \
-            --platform ${{ inputs.platforms }} \
-            --push \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            php${{ inputs.php }}-unit
-
-      - name: Move cache
-        if: always()
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+      - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}-unit
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
 
   build-unit-dev:
     needs: build-unit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-qemu-action@v3
-
       - uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-            network=host
-
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -289,25 +217,15 @@ jobs:
         run: |
           echo "tags=${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev" >> "$GITHUB_OUTPUT"
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
+      - uses: docker/build-push-action@v6
         with:
-          path: ${{ env.CACHE_PATH }}
-          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-dev-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-dev-
-            ${{ runner.os }}-buildx-php${{ inputs.php }}-
-            ${{ runner.os }}-buildx-
-
-      - name: Build and push unit-dev image
-        run: |
-          docker buildx build \
-            -t ${{ steps.tags.outputs.tags }} \
-            --platform ${{ inputs.platforms }} \
-            --push \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --build-arg PHPV=${{ inputs.php }} \
-            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
-            --build-arg VCS_REF=${{ github.sha }} \
-            unit-php-builder/dev
+          context: unit-php-builder/dev
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            PHPV=${{ inputs.php }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=registry,ref=skilldlabs/php:buildcache
+          cache-to: type=registry,ref=skilldlabs/php:buildcache,mode=max
