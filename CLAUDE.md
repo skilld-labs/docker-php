@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Docker image collection for PHP (7.4 through 8.5) optimized for Drupal, published as `skilldlabs/php` on Docker Hub. All images are multi-platform (linux/amd64, linux/arm64) and Alpine-based (except FrankenPHP which uses Ubuntu).
 
+Read `RELEASE_RUNBOOK.md` before doing a monthly PHP patch release. It contains the release checklist and the March 11, 2026 postmortem for the CI failure that was fixed in commit `7531dc0`.
+
 ## Build Commands
 
 ```bash
@@ -80,6 +82,9 @@ See `.github/workflows/build-php.yml` for CI implementation.
 # Resolve release tag from php-src + installed apk version
 ./release-php.sh check 85
 ./release-php.sh publish 85
+
+# Full monthly release guide and postmortem
+sed -n '1,260p' RELEASE_RUNBOOK.md
 
 # Show all jobs in a run
 ./gh-debug.sh jobs
