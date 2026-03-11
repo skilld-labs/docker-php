@@ -30,6 +30,8 @@ env:
 jobs:
   build-base:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.tags.outputs.base_tag }}
     steps:
       - uses: actions/checkout@v4
 
@@ -50,8 +52,29 @@ jobs:
             TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}
+          platforms: linux/amd64
+          push: false
+          load: true
+          no-cache: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            COMPOSER_HASH=${{ env.COMPOSER_HASH }}
+            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+
+      - name: Test base image
+        run: |
+          PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
+          tests/test-base.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+
+      - name: Push base image
+        uses: docker/build-push-action@v6
         with:
           context: php${{ inputs.php }}
           platforms: ${{ inputs.platforms }}
@@ -87,8 +110,27 @@ jobs:
             TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-fpm-${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-fpm" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}-fpm
+          platforms: linux/amd64
+          push: false
+          load: true
+          no-cache: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+
+      - name: Test FPM image
+        run: |
+          PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
+          tests/test-fpm.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+
+      - name: Push FPM image
+        uses: docker/build-push-action@v6
         with:
           context: php${{ inputs.php }}-fpm
           platforms: ${{ inputs.platforms }}
@@ -122,8 +164,27 @@ jobs:
             TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-unit" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v6
+        with:
+          context: php${{ inputs.php }}-unit
+          platforms: linux/amd64
+          push: false
+          load: true
+          no-cache: true
+          tags: ${{ steps.tags.outputs.base_tag }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+
+      - name: Test Unit image
+        run: |
+          PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
+          tests/test-unit.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+
+      - name: Push Unit image
+        uses: docker/build-push-action@v6
         with:
           context: php${{ inputs.php }}-unit
           platforms: ${{ inputs.platforms }}

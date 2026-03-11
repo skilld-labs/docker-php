@@ -1,12 +1,13 @@
 NAME = skilldlabs/php
-TAGS ?= 81 81-fpm 81-unit 82 82-fpm 82-unit 83 83-fpm 83-unit 84 84-fpm 84-unit
+TAGS ?= 81 81-fpm 81-unit 82 82-fpm 82-unit 83 83-fpm 83-unit 84 84-fpm 84-unit 85 85-fpm 85-unit
 
 COMPOSER_HASH ?= c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47
 DRUSH_VERSION ?= 8.5.0
 DOCKER_BUILDKIT ?= 1
-PLATFORM ?= linux/amd64,linux/arm64
+#PLATFORM ?= linux/amd64,linux/arm64
+PLATFORM ?= linux/amd64
 
-.PHONY: all build push prepare
+.PHONY: all build push prepare test test-local
 
 all: build push
 
@@ -45,3 +46,43 @@ tag:
 		docker push $(NAME):$$tag; \
 		docker rmi $(NAME):$$tag $(NAME):$$i; \
 	done
+
+# Test images locally (build for amd64 only, test, then optionally push)
+test-local:
+	@echo "Building and testing images for tags: $(TAGS) (amd64 only)"
+	set -e; for i in $(TAGS); do \
+		printf "\n=== Testing $(NAME):$$i ===\n\n"; \
+		phpv=$$(echo $$i | sed 's/-.*//'); \
+		phpver=$$(echo $$phpv | sed 's/^\(.\)\(.\)$$/\1.\2/'); \
+		variant=$$(echo $$i | sed 's/^[0-9]*//'); \
+		case "$$variant" in \
+			"") \
+				cd $$phpv; \
+				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
+					--build-arg COMPOSER_HASH=$(COMPOSER_HASH) \
+					--build-arg DRUSH_VERSION=$(DRUSH_VERSION) \
+					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
+				cd ..; \
+				tests/test-base.sh $(NAME):$$i $$phpver; \
+				;; \
+			-fpm) \
+				cd $$phpv-fpm; \
+				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
+					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
+				cd ..; \
+				tests/test-fpm.sh $(NAME):$$i $$phpver; \
+				;; \
+			-unit) \
+				cd $$phpv-unit; \
+				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
+					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
+				cd ..; \
+				tests/test-unit.sh $(NAME):$$i $$phpver; \
+				;; \
+		esac; \
+	done
+	@echo "\n=== All tests passed! ==="
+	@echo "To push images, run: make push TAGS='$(TAGS)'"
