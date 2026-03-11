@@ -6,7 +6,12 @@
       "Bash(./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5 2>&1 | tail -15)",
       "Bash(./tests/test-unit.sh skilldlabs/php:85-unit 8.5 2>&1 | tail -15)",
       "Bash(./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5 2>&1 | grep -E \"Test [0-9]:|PASSED|FAILED\")",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(gh api:*)",
+      "Bash(./gh-debug.sh trigger:*)",
+      "Bash(./gh-debug.sh watch:*)",
+      "Bash(sleep 120 && ./gh-debug.sh list)",
+      "Bash(./gh-debug.sh failed:*)"
     ]
   }
 }

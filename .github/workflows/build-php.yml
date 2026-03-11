@@ -132,7 +132,7 @@ jobs:
         if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
-          tests/test-fpm.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+          tests/test-fpm-ci.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
       - uses: docker/build-push-action@v6
         with:
