@@ -33,11 +33,22 @@ ${RUNTIME} run -d --name "${CONTAINER_NAME}" "${IMAGE}" || {
   echo "Failed to start container"
   exit 1
 }
-sleep 2
+
+# Wait for container to be ready (give it more time in CI)
+sleep 3
 
 # Verify container is running
 if ! ${RUNTIME} ps --filter "name=${CONTAINER_NAME}" --format "{{.Names}}" 2>/dev/null | grep -q "${CONTAINER_NAME}"; then
   echo "Container failed to start"
+  ${RUNTIME} logs "${CONTAINER_NAME}" 2>&1 || true
+  remove_container "${CONTAINER_NAME}"
+  exit 1
+fi
+
+# Verify php-fpm is actually running
+sleep 2
+if ! exec_container "${CONTAINER_NAME}" sh -c "php-fpm${PHPV} -v" >/dev/null 2>&1; then
+  echo "PHP-FPM not responding, checking logs..."
   ${RUNTIME} logs "${CONTAINER_NAME}" 2>&1 || true
   remove_container "${CONTAINER_NAME}"
   exit 1
