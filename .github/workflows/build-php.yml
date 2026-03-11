@@ -31,8 +31,6 @@ env:
   REGISTRY: skilldlabs/php
   COMPOSER_HASH: "c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47"
   DRUSH_VERSION: "8.5.0"
-  CACHE_TYPE: type=local,mode=max
-  CACHE_PATH: /tmp/.buildx-cache
 
 jobs:
   # Setup cache and build all variants in parallel
@@ -69,7 +67,7 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
-          path: ${{ env.CACHE_PATH }}
+          path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-php${{ inputs.php }}-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-php${{ inputs.php }}-
@@ -82,8 +80,8 @@ jobs:
             -t ${{ steps.tags.outputs.base_tag }} \
             --platform linux/amd64 \
             --load \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
             --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
@@ -102,13 +100,20 @@ jobs:
             -t ${{ steps.tags.outputs.tags }} \
             --platform ${{ inputs.platforms }} \
             --push \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
             --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
             php${{ inputs.php }}
+
+      # This runs in background to move cache after completion
+      - name: Move cache
+        if: always()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
   build-fpm:
     needs: build-base
@@ -142,7 +147,7 @@ jobs:
       - name: Cache Docker layers
         uses: actions/cache@v4
         with:
-          path: ${{ env.CACHE_PATH }}
+          path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-
@@ -155,8 +160,8 @@ jobs:
             -t ${{ steps.tags.outputs.base_tag }} \
             --platform linux/amd64 \
             --load \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
             php${{ inputs.php }}-fpm
@@ -173,11 +178,17 @@ jobs:
             -t ${{ steps.tags.outputs.tags }} \
             --platform ${{ inputs.platforms }} \
             --push \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
             php${{ inputs.php }}-fpm
+
+      - name: Move cache
+        if: always()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
   build-unit:
     needs: build-base
@@ -224,8 +235,8 @@ jobs:
             -t ${{ steps.tags.outputs.base_tag }} \
             --platform linux/amd64 \
             --load \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
             php${{ inputs.php }}-unit
@@ -242,11 +253,17 @@ jobs:
             -t ${{ steps.tags.outputs.tags }} \
             --platform ${{ inputs.platforms }} \
             --push \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
             php${{ inputs.php }}-unit
+
+      - name: Move cache
+        if: always()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
   build-unit-dev:
     needs: build-unit
@@ -288,8 +305,8 @@ jobs:
             -t ${{ steps.tags.outputs.tags }} \
             --platform ${{ inputs.platforms }} \
             --push \
-            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
-            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             --build-arg PHPV=${{ inputs.php }} \
             --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
             --build-arg VCS_REF=${{ github.sha }} \
