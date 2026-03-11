@@ -35,24 +35,42 @@ ${RUNTIME} run -d --name "${CONTAINER_NAME}" "${IMAGE}" || {
 }
 
 # Wait for container to be ready (give it more time in CI)
-sleep 3
+sleep 5
 
-# Verify container is running
-if ! ${RUNTIME} ps --filter "name=${CONTAINER_NAME}" --format "{{.Names}}" 2>/dev/null | grep -q "${CONTAINER_NAME}"; then
+# Verify container is running - use multiple methods
+CONTAINER_RUNNING=false
+if ${RUNTIME} ps --filter "name=${CONTAINER_NAME}" --format "{{.Names}}" 2>/dev/null | grep -q "${CONTAINER_NAME}"; then
+  CONTAINER_RUNNING=true
+elif ${RUNTIME} ps -q --filter "name=${CONTAINER_NAME}" 2>/dev/null | grep -q .; then
+  CONTAINER_RUNNING=true
+fi
+
+if [ "$CONTAINER_RUNNING" = "false" ]; then
   echo "Container failed to start"
   ${RUNTIME} logs "${CONTAINER_NAME}" 2>&1 || true
   remove_container "${CONTAINER_NAME}"
   exit 1
 fi
 
-# Verify php-fpm is actually running
-sleep 2
-if ! exec_container "${CONTAINER_NAME}" sh -c "php-fpm${PHPV} -v" >/dev/null 2>&1; then
-  echo "PHP-FPM not responding, checking logs..."
-  ${RUNTIME} logs "${CONTAINER_NAME}" 2>&1 || true
-  remove_container "${CONTAINER_NAME}"
-  exit 1
-fi
+# Verify php-fpm is actually running with retries
+RETRIES=3
+for i in $(seq 1 $RETRIES); do
+  if exec_container "${CONTAINER_NAME}" sh -c "php-fpm${PHPV} -v" >/dev/null 2>&1; then
+    break
+  fi
+  if [ $i -lt $RETRIES ]; then
+    echo "PHP-FPM not ready yet, waiting... ($i/$RETRIES)"
+    sleep 2
+  else
+    echo "PHP-FPM not responding after $RETRIES attempts"
+    echo "Container status:"
+    ${RUNTIME} ps --filter "name=${CONTAINER_NAME}" 2>/dev/null || true
+    echo "Container logs:"
+    ${RUNTIME} logs "${CONTAINER_NAME}" 2>&1 || true
+    remove_container "${CONTAINER_NAME}"
+    exit 1
+  fi
+done
 
 # Set CONTAINER_NAME for run_test to use
 export CONTAINER_NAME

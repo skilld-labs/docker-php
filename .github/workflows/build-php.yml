@@ -16,6 +16,11 @@ on:
         required: false
         type: string
         default: "linux/amd64,linux/arm64"
+      skip_tests:
+        description: "Skip running tests (faster, less safe)"
+        required: false
+        type: boolean
+        default: false
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -26,18 +31,24 @@ env:
   REGISTRY: skilldlabs/php
   COMPOSER_HASH: "c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47"
   DRUSH_VERSION: "8.5.0"
+  CACHE_TYPE: type=local,mode=max
+  CACHE_PATH: /tmp/.buildx-cache
 
 jobs:
+  # Setup cache and build all variants in parallel
+  # Each job: build test image (amd64) → test → build all platforms → push
   build-base:
     runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.tags.outputs.base_tag }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
       - uses: docker/login-action@v3
         with:
@@ -54,38 +65,50 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/build-push-action@v6
+      # Restore cache to speed up builds
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          context: php${{ inputs.php }}
-          platforms: linux/amd64
-          push: false
-          load: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.base_tag }}
-          build-args: |
-            COMPOSER_HASH=${{ env.COMPOSER_HASH }}
-            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+          path: ${{ env.CACHE_PATH }}
+          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build and test base image (amd64 only)
+        run: |
+          # Build with cache, load for testing
+          docker buildx build \
+            -t ${{ steps.tags.outputs.base_tag }} \
+            --platform linux/amd64 \
+            --load \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
+            --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}
 
       - name: Test base image
+        if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-base.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push base image
-        uses: docker/build-push-action@v6
-        with:
-          context: php${{ inputs.php }}
-          platforms: ${{ inputs.platforms }}
-          push: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.tags }}
-          build-args: |
-            COMPOSER_HASH=${{ env.COMPOSER_HASH }}
-            DRUSH_VERSION=${{ env.DRUSH_VERSION }}
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+      - name: Push base image (all platforms)
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.tags }} \
+            --platform ${{ inputs.platforms }} \
+            --push \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg COMPOSER_HASH=${{ env.COMPOSER_HASH }} \
+            --build-arg DRUSH_VERSION=${{ env.DRUSH_VERSION }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}
 
   build-fpm:
     needs: build-base
@@ -96,6 +119,10 @@ jobs:
       - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
       - uses: docker/login-action@v3
         with:
@@ -112,34 +139,45 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-fpm" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/build-push-action@v6
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          context: php${{ inputs.php }}-fpm
-          platforms: linux/amd64
-          push: false
-          load: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.base_tag }}
-          build-args: |
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+          path: ${{ env.CACHE_PATH }}
+          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-fpm-
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build and test FPM image (amd64 only)
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.base_tag }} \
+            --platform linux/amd64 \
+            --load \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}-fpm
 
       - name: Test FPM image
+        if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-fpm.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push FPM image
-        uses: docker/build-push-action@v6
-        with:
-          context: php${{ inputs.php }}-fpm
-          platforms: ${{ inputs.platforms }}
-          push: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.tags }}
-          build-args: |
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+      - name: Push FPM image (all platforms)
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.tags }} \
+            --platform ${{ inputs.platforms }} \
+            --push \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}-fpm
 
   build-unit:
     needs: build-base
@@ -150,6 +188,10 @@ jobs:
       - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
       - uses: docker/login-action@v3
         with:
@@ -166,34 +208,45 @@ jobs:
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-unit" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/build-push-action@v6
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          context: php${{ inputs.php }}-unit
-          platforms: linux/amd64
-          push: false
-          load: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.base_tag }}
-          build-args: |
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+          path: ${{ env.CACHE_PATH }}
+          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build and test Unit image (amd64 only)
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.base_tag }} \
+            --platform linux/amd64 \
+            --load \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}-unit
 
       - name: Test Unit image
+        if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
           tests/test-unit.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
 
-      - name: Push Unit image
-        uses: docker/build-push-action@v6
-        with:
-          context: php${{ inputs.php }}-unit
-          platforms: ${{ inputs.platforms }}
-          push: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.tags }}
-          build-args: |
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+      - name: Push Unit image (all platforms)
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.tags }} \
+            --platform ${{ inputs.platforms }} \
+            --push \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            php${{ inputs.php }}-unit
 
   build-unit-dev:
     needs: build-unit
@@ -204,6 +257,10 @@ jobs:
       - uses: docker/setup-qemu-action@v3
 
       - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
       - uses: docker/login-action@v3
         with:
@@ -215,14 +272,25 @@ jobs:
         run: |
           echo "tags=${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/build-push-action@v6
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          context: unit-php-builder/dev
-          platforms: ${{ inputs.platforms }}
-          push: true
-          no-cache: true
-          tags: ${{ steps.tags.outputs.tags }}
-          build-args: |
-            PHPV=${{ inputs.php }}
-            BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+          path: ${{ env.CACHE_PATH }}
+          key: ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-dev-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-unit-dev-
+            ${{ runner.os }}-buildx-php${{ inputs.php }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build and push unit-dev image
+        run: |
+          docker buildx build \
+            -t ${{ steps.tags.outputs.tags }} \
+            --platform ${{ inputs.platforms }} \
+            --push \
+            --cache-from ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --cache-to ${{ env.CACHE_TYPE }}${{ env.CACHE_PATH }} \
+            --build-arg PHPV=${{ inputs.php }} \
+            --build-arg BUILD_DATE=${{ github.event.repository.updated_at }} \
+            --build-arg VCS_REF=${{ github.sha }} \
+            unit-php-builder/dev
