@@ -39,12 +39,12 @@ Build args `COMPOSER_HASH` and `DRUSH_VERSION` are defined in the root Makefile 
 make test-local TAGS="85 85-fpm 85-unit"
 
 # Test individual images
-./tests/test-base.sh skilldlabs/php:85 8.5
-./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5
-./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
+./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm
+./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 
 # Test with specific runtime (docker/podman/nerdctl)
-CONTAINER_RUNTIME=podman ./tests/test-base.sh skilldlabs/php:85 8.5
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ### CI Testing
@@ -76,6 +76,10 @@ See `.github/workflows/build-php.yml` for CI implementation.
 
 # Trigger a new workflow
 ./gh-debug.sh trigger
+
+# Resolve release tag from php-src + installed apk version
+./release-php.sh check 85
+./release-php.sh publish 85
 
 # Show all jobs in a run
 ./gh-debug.sh jobs
@@ -178,7 +182,7 @@ docker-php/
    - Loads image for testing with `--load`
 
 2. **Run Tests**
-   - Executes appropriate test script (`test-base.sh`, `test-fpm.sh`, `test-unit.sh`)
+   - Executes `tests/run-test.sh`, which starts the container and delegates to the matching in-container test script
    - Tests use single container with multiple `exec` calls (optimized)
 
 3. **Push All Platforms** (if tests pass)
@@ -202,7 +206,12 @@ gh workflow run "Build PHP 8.5"
 
 # With version tag
 gh workflow run "Build PHP 8.5" -f version=8.5.3
+
+# Resolve the version tag before dispatching
+./release-php.sh publish 85
 ```
+
+Versioned Docker tags should come from the latest stable `php/php-src` tag and must match the installed Alpine `phpXX` package version in the image.
 
 ## Test Coverage
 

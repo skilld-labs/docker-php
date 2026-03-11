@@ -284,7 +284,7 @@ if [ -n "$SHELL_CONFIG" ]; then
 
 # Rootless container aliases
 alias podman-podman='CONTAINER_RUNTIME=podman'
-alias podman-test='CONTAINER_RUNTIME=podman ./tests/test-base.sh'
+alias podman-test='CONTAINER_RUNTIME=podman ./tests/run-test.sh'
 
 rootless-on() {
   export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
@@ -324,14 +324,14 @@ echo ""
 
 if [ $INSTALL_PODMAN -eq 1 ] && command -v podman >/dev/null 2>&1; then
   echo "📦 Podman: $(podman --version)"
-  echo "   Test: CONTAINER_RUNTIME=podman ./tests/test-base.sh skilldlabs/php:85 8.5"
+  echo "   Test: CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85 8.5 base"
 fi
 
 if [ $INSTALL_DOCKERLESS -eq 1 ]; then
   if systemctl --user is-active docker.service >/dev/null 2>&1; then
     echo "🐳 Docker Rootless: Running"
-    echo "   Test: DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock ./tests/test-base.sh skilldlabs/php:85 8.5"
-    echo "   Or: rootless-on && ./tests/test-base.sh skilldlabs/php:85 8.5"
+    echo "   Test: DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock ./tests/run-test.sh skilldlabs/php:85 8.5 base"
+    echo "   Or: rootless-on && ./tests/run-test.sh skilldlabs/php:85 8.5 base"
   else
     echo "🐳 Docker Rootless: Not running (check: journalctl --user -u docker.service)"
   fi

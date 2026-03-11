@@ -1,7 +1,7 @@
 #!/bin/bash
 # Unit image - Web server + Drupal essentials
 # Usage: docker exec CONTAINER /tests/test-unit.sh [EXPECTED_PHP]
-# Assumes container is already running (agent-managed lifecycle)
+# Assumes container is already running (agent-managed lifecycle via tests/run-test.sh)
 
 set -e
 

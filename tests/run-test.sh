@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test runner script - manages container lifecycle for testing
+# Test runner script - public entrypoint that manages container lifecycle
 # Usage: tests/run-test.sh <IMAGE> <PHP_VERSION> [TEST_TYPE]
 #   IMAGE: Docker image name (e.g., skilldlabs/php:85)
 #   PHP_VERSION: PHP version (e.g., 8.5)

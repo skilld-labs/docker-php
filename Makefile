@@ -64,7 +64,7 @@ test-local:
 					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
 				cd ..; \
-				tests/test-base.sh $(NAME):$$i $$phpver; \
+				tests/run-test.sh $(NAME):$$i $$phpver base; \
 				;; \
 			-fpm) \
 				cd $$phpv-fpm; \
@@ -72,7 +72,7 @@ test-local:
 					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
 				cd ..; \
-				tests/test-fpm.sh $(NAME):$$i $$phpver; \
+				tests/run-test.sh $(NAME):$$i $$phpver fpm; \
 				;; \
 			-unit) \
 				cd $$phpv-unit; \
@@ -80,7 +80,7 @@ test-local:
 					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
 				cd ..; \
-				tests/test-unit.sh $(NAME):$$i $$phpver; \
+				tests/run-test.sh $(NAME):$$i $$phpver unit; \
 				;; \
 		esac; \
 	done

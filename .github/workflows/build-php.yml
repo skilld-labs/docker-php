@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       version:
-        description: "Version tag (e.g. 8.5.3). Leave empty to skip."
+        description: "Version tag from latest stable php-src release matching installed apk version (e.g. 8.5.4). Leave empty to skip."
         required: false
         type: string
       platforms:
@@ -76,7 +76,7 @@ jobs:
         if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
-          tests/test-base.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+          tests/run-test.sh ${{ steps.tags.outputs.base_tag }} ${PHPV} base
 
       - uses: docker/build-push-action@v6
         with:
@@ -132,7 +132,7 @@ jobs:
         if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
-          tests/test-fpm.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+          tests/run-test.sh ${{ steps.tags.outputs.base_tag }} ${PHPV} fpm
 
       - uses: docker/build-push-action@v6
         with:
@@ -186,7 +186,7 @@ jobs:
         if: ${{ !inputs.skip_tests }}
         run: |
           PHPV=$(echo "${{ inputs.php }}" | sed 's/^\(.\)\(.\)$/\1.\2/')
-          tests/test-unit.sh ${{ steps.tags.outputs.base_tag }} ${PHPV}
+          tests/run-test.sh ${{ steps.tags.outputs.base_tag }} ${PHPV} unit
 
       - uses: docker/build-push-action@v6
         with:

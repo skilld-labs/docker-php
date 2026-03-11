@@ -1,7 +1,7 @@
 #!/bin/bash
 # Base PHP image - Drupal CLI essentials
 # Usage: docker exec CONTAINER /tests/test-base.sh [EXPECTED_PHP]
-# Assumes container is already running (agent-managed lifecycle)
+# Assumes container is already running (agent-managed lifecycle via tests/run-test.sh)
 
 set -e
 

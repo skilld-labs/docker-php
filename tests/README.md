@@ -22,19 +22,22 @@ Tests automatically detect available runtimes in this order:
 
 ```bash
 # Use podman explicitly
-CONTAINER_RUNTIME=podman tests/test-base.sh skilldlabs/php:85 8.5
+CONTAINER_RUNTIME=podman tests/run-test.sh skilldlabs/php:85 8.5 base
 
 # Use nerdctl explicitly
-CONTAINER_RUNTIME=nerdctl tests/test-base.sh skilldlabs/php:85 8.5
+CONTAINER_RUNTIME=nerdctl tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ## Test Scripts
 
 | Script | Purpose | Container Starts |
 |--------|---------|------------------|
+| `run-test.sh` | Public test entrypoint, manages container lifecycle | 1 |
 | `test-base.sh` | Tests base PHP images (cli, composer, drush, extensions) | 1 (optimized) |
 | `test-fpm.sh` | Tests PHP-FPM images (daemon, config, permissions) | 1 |
 | `test-unit.sh` | Tests Unit images (unitd, config, web-user) | 1 |
+
+The `test-*.sh` scripts run inside an already started container. Use `run-test.sh` from the host in CI and local development.
 
 ## Usage
 
@@ -42,13 +45,13 @@ CONTAINER_RUNTIME=nerdctl tests/test-base.sh skilldlabs/php:85 8.5
 
 ```bash
 # Base image
-./tests/test-base.sh skilldlabs/php:85 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
 
 # FPM image
-./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5
+./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm
 
 # Unit image
-./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 ```
 
 ### Test with Makefile

@@ -148,13 +148,13 @@ docker ps
 export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
 
 # Run tests
-./tests/test-base.sh skilldlabs/php:85 8.5
-./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5
-./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
+./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm
+./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 
 # Or use the runtime override
 CONTAINER_RUNTIME=docker DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock \
-  ./tests/test-base.sh skilldlabs/php:85 8.5
+  ./tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ### Create Aliases for Easy Switching
@@ -183,10 +183,10 @@ rootless-off() {
 Usage:
 ```bash
 rootless-on
-./tests/test-base.sh skilldlabs/php:85 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
 
 rootless-off
-./tests/test-base.sh skilldlabs/php:85 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ## Podman Alternative (Often Easier)
@@ -201,7 +201,7 @@ sudo apt-get install -y podman
 podman info
 
 # Run tests with podman
-CONTAINER_RUNTIME=podman ./tests/test-base.sh skilldlabs/php:85 8.5
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ## Troubleshooting
@@ -255,8 +255,8 @@ Rootless Docker in CI (GitHub Actions, GitLab CI):
 
 | Test | Rootful | Rootless | Podman |
 |------|---------|----------|--------|
-| test-base.sh | ✓ | ✓ | ✓ |
-| test-fpm.sh | ✓ | ✓ | ✓ |
-| test-unit.sh (port 80) | ✓ | needs >1024 | needs >1024 |
+| run-test.sh (base) | ✓ | ✓ | ✓ |
+| run-test.sh (fpm) | ✓ | ✓ | ✓ |
+| run-test.sh (unit, port 80) | ✓ | needs >1024 | needs >1024 |
 
 **Recommendation**: Use rootless Docker for base/fpm tests, use Podman or rootful Docker for unit tests (port 80).

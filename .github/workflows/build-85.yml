@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version tag (e.g. 8.5.3). Leave empty to skip."
+        description: "Stable php-src tag matching installed apk version (e.g. 8.5.4). Leave empty to skip."
         required: false
 
 jobs:

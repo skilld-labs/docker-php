@@ -19,9 +19,9 @@ Quick commands for testing with different container runtimes.
 make test-local TAGS="85 85-fpm 85-unit"
 
 # Individual
-./tests/test-base.sh skilldlabs/php:85 8.5
-./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5
-./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
+./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm
+./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 ```
 
 ### Using Rootless Docker (after setup)
@@ -32,11 +32,11 @@ make test-local TAGS="85 85-fpm 85-unit"
 # Choose option 2 (Docker Rootless)
 
 # Then test
-DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock ./tests/test-base.sh skilldlabs/php:85 8.5
+DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock ./tests/run-test.sh skilldlabs/php:85 8.5 base
 
 # Or use the alias (after sourcing .bashrc)
 rootless-on
-./tests/test-base.sh skilldlabs/php:85 8.5
+./tests/run-test.sh skilldlabs/php:85 8.5 base
 ```
 
 ### Using Podman (recommended - easiest)
@@ -47,9 +47,9 @@ rootless-on
 # Choose option 1 (Podman)
 
 # Then test
-CONTAINER_RUNTIME=podman ./tests/test-base.sh skilldlabs/php:85 8.5
-CONTAINER_RUNTIME=podman ./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5
-CONTAINER_RUNTIME=podman ./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85 8.5 base
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 ```
 
 ## Setup Rootless Containers
@@ -60,7 +60,7 @@ CONTAINER_RUNTIME=podman ./tests/test-unit.sh skilldlabs/php:85-unit 8.5
 
 # Manual Podman install
 sudo apt-get install -y podman
-CONTAINER_RUNTIME=podman ./tests/test-base.sh skilldlabs/php:85 8.5
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85 8.5 base
 
 # Manual Docker Rootless install
 sudo apt-get install -y uidmap slirp4netns fuse-overlayfs
@@ -84,9 +84,9 @@ export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock
 
 | Test | Rootful | Rootless | Podman |
 |------|---------|----------|--------|
-| test-base.sh | ✓ | ✓ | ✓ |
-| test-fpm.sh | ✓ | ✓ | ✓ |
-| test-unit.sh | ✓ | ⚠ port 80 | ⚠ port 80 |
+| run-test.sh (base) | ✓ | ✓ | ✓ |
+| run-test.sh (fpm) | ✓ | ✓ | ✓ |
+| run-test.sh (unit) | ✓ | ⚠ port 80 | ⚠ port 80 |
 
 ⚠ = Unit tests use port 80 which requires root or workaround
 
@@ -96,10 +96,10 @@ For rootless testing of unit images:
 
 ```bash
 # Use a higher port
-CONTAINER_RUNTIME=podman ./tests/test-unit.sh skilldlabs/php:85-unit 8.5
+CONTAINER_RUNTIME=podman ./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit
 
 # Or modify test to use port 8080
-# Edit tests/test-unit.sh: change `-p 8080:80` is already there
+# Adjust the container runtime/networking to avoid privileged port binding
 ```
 
 ## Verify Runtime
@@ -124,9 +124,9 @@ alias use-podman='export CONTAINER_RUNTIME=podman'
 alias use-rootless='export CONTAINER_RUNTIME=docker; export DOCKER_HOST=unix:///run/user/$(id -u)/docker.sock'
 
 # Quick test
-alias test-base='./tests/test-base.sh skilldlabs/php:85 8.5'
-alias test-fpm='./tests/test-fpm.sh skilldlabs/php:85-fpm 8.5'
-alias test-unit='./tests/test-unit.sh skilldlabs/php:85-unit 8.5'
+alias test-base='./tests/run-test.sh skilldlabs/php:85 8.5 base'
+alias test-fpm='./tests/run-test.sh skilldlabs/php:85-fpm 8.5 fpm'
+alias test-unit='./tests/run-test.sh skilldlabs/php:85-unit 8.5 unit'
 
 # Combined
 alias test-all='make test-local TAGS="85 85-fpm 85-unit"'
@@ -183,9 +183,10 @@ podman rm -f test-unit-85
 | File | Purpose |
 |------|---------|
 | `tests/test-lib.sh` | Shared test library with runtime detection |
-| `tests/test-base.sh` | Base image tests |
-| `tests/test-fpm.sh` | FPM image tests |
-| `tests/test-unit.sh` | Unit image tests |
+| `tests/run-test.sh` | Host-side test entrypoint |
+| `tests/test-base.sh` | Base image tests run inside container |
+| `tests/test-fpm.sh` | FPM image tests run inside container |
+| `tests/test-unit.sh` | Unit image tests run inside container |
 | `tests/install-rootless.sh` | Interactive setup script |
 | `tests/ROOTLESS.md` | Detailed rootless guide |
 | `tests/QUICKREF.md` | This file |
