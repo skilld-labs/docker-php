@@ -1,0 +1,114 @@
+# PHP Extensions manifest for Docker images
+# This file defines the expected extensions for each PHP version
+# Used by test scripts to validate that all required extensions are present
+
+# Core extensions that should always be present (built into PHP)
+core:
+  - Core
+  - PDO
+  - Phar
+  - Reflection
+  - SPL
+  - SimpleXML
+  - date
+  - filter
+  - hash
+  - json
+  - libxml
+  - mysqlnd
+  - openssl
+  - pcre
+  - random
+  - session
+  - standard
+  - tokenizer
+  - xml
+  - zlib
+
+# Zend extensions (OPcache, Xdebug, etc.)
+zend:
+  opcache: "Zend OPcache"  # Module name differs from extension name
+  xdebug: "xdebug"         # PECL extension
+
+# Extension modules provided by Alpine packages
+# Format: <package-name>: <module-name-in-php>
+# If module-name matches package-name, it can be omitted
+alpine_packages:
+  bcmath: "bcmath"
+  ctype: "ctype"
+  curl: "curl"
+  dom: "dom"
+  fileinfo: "fileinfo"
+  gd: "gd"
+  gmp: "gmp"
+  iconv: "iconv"
+  mbstring: "mbstring"
+  openssl: "openssl"
+  pcntl: "pcntl"
+  pdo_mysql: "pdo_mysql"
+  pdo_sqlite: "pdo_sqlite"
+  phar: "Phar"
+  session: "session"
+  simplexml: "SimpleXML"
+  sqlite3: "sqlite3"
+  tokenizer: "tokenizer"
+  xml: "xml"
+  xmlreader: "xmlreader"
+  xmlwriter: "xmlwriter"
+  zip: "zip"
+
+# PECL extensions
+pecl:
+  apcu: "apcu"
+  brotli: "brotli"
+  igbinary: "igbinary"
+  uploadprogress: "uploadprogress"
+  xdebug: "xdebug"
+
+# PHP version specific extensions
+# Add extensions that only exist in certain versions
+version_specific:
+  # PHP 8.4
+  "84":
+    extra: []
+
+  # PHP 8.5+ (new extensions vs 8.4)
+  "85":
+    extra:
+      - lexbor      # New HTML parser extension in PHP 8.5
+      - uri         # New URI handling extension in PHP 8.5
+
+# Expected extension counts by PHP version
+# Used for quick validation that all modules are loaded
+# Verified by actual builds:
+expected_counts:
+  "74": 35
+  "81": 38
+  "82": 38
+  "83": 39
+  "84": 43    # Verified: PHP 8.4.19 has 43 modules
+  "85": 45    # Verified: PHP 8.5.4 has 45 modules (+lexbor, +uri vs 8.4)
+
+# Validation rules
+validation:
+  # Require these minimum module counts
+  min_modules: 30
+
+  # Extensions that must be present (critical for Drupal)
+  required:
+    - Zend OPcache
+    - apcu
+    - gd
+    - json
+    - mbstring
+    - pdo_mysql
+    - pdo_sqlite
+    - curl
+    - openssl
+    - zip
+
+  # Optional but recommended extensions
+  recommended:
+    - xdebug
+    - igbinary
+    - brotli
