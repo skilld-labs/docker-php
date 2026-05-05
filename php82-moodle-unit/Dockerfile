@@ -60,7 +60,7 @@ RUN set -e \
   php82-xmlwriter \
   php82-zip \
   s6-overlay \
-  unit-php82 \
+  freeunit-php82 \
   $PHPRUN_DEPS \
   && ln -fs php82 /usr/bin/php \
   && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
