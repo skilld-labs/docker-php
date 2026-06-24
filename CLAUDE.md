@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Docker image collection for PHP (7.4 through 8.5) optimized for Drupal, published as `skilldlabs/php` on Docker Hub. All images are multi-platform (linux/amd64, linux/arm64) and Alpine-based (except FrankenPHP which uses Ubuntu).
+Docker image collection for PHP (7.4 through 8.5) optimized for Drupal, published to two registries from a single build: Docker Hub (`skilldlabs/php`) and GitHub Container Registry (`ghcr.io/skilld-labs/php`). All images are multi-platform (linux/amd64, linux/arm64) and Alpine-based (except FrankenPHP which uses Ubuntu).
 
 Read `RELEASE_RUNBOOK.md` before doing a monthly PHP patch release. It contains the release checklist and the March 11, 2026 postmortem for the CI failure that was fixed in commit `7531dc0`.
 
@@ -192,7 +192,22 @@ docker-php/
 
 3. **Push All Platforms** (if tests pass)
    - Builds for all platforms using cache
-   - Pushes to Docker Hub with version tags
+   - Pushes the same digest to **both** Docker Hub and ghcr.io with version tags (see Container Registries below)
+
+### Container Registries
+
+CI publishes every image to two registries in a single `docker/build-push-action` push (same digest, no rebuild or re-pull, multi-arch preserved):
+
+| Registry | Image | Auth |
+|----------|-------|------|
+| Docker Hub | `skilldlabs/php` (`env.REGISTRY`) | `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` secrets |
+| GitHub Container Registry | `ghcr.io/skilld-labs/php` (`env.GHCR_REGISTRY`) | built-in `GITHUB_TOKEN` (`github.actor`) |
+
+- The ghcr namespace is the **GitHub org** `skilld-labs` (hyphen), not the Docker Hub org `skilldlabs` (no hyphen). They are deliberately different and cannot be unified.
+- ghcr push needs `packages: write`. The permission is declared at the workflow level in `build-php.yml` **and** in each caller (`build-{VER}.yml`) — for `workflow_call`, the caller's `permissions` block governs the `GITHUB_TOKEN` scope handed to the reusable workflow. No extra secret is required because the package lives under the same org as the repo.
+- New ghcr packages are **private** by default. After the first push, set the `php` package visibility to Public and link it to the repo on the org Packages page.
+- Both `:NN` rolling tags and optional `:VERSION` tags are mirrored. The amd64 test image (`base_tag`) is Docker Hub-only since it is loaded locally and never pushed.
+- FrankenPHP workflows push to Docker Hub only.
 
 ### Cache Strategy
 

@@ -29,8 +29,13 @@ on:
 
 env:
   REGISTRY: skilldlabs/php
+  GHCR_REGISTRY: ghcr.io/skilld-labs/php
   COMPOSER_HASH: "c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47"
   DRUSH_VERSION: "8.5.0"
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-base:
@@ -45,13 +50,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate tags
         id: tags
         run: |
-          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}"
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }},${{ env.GHCR_REGISTRY }}:${{ inputs.php }}"
           if [ -n "${{ inputs.version }}" ]; then
-            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.version }}"
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.version }},${{ env.GHCR_REGISTRY }}:${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}" >> "$GITHUB_OUTPUT"
@@ -103,13 +113,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate tags
         id: tags
         run: |
-          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-fpm"
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-fpm,${{ env.GHCR_REGISTRY }}:${{ inputs.php }}-fpm"
           if [ -n "${{ inputs.version }}" ]; then
-            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-fpm-${{ inputs.version }}"
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-fpm-${{ inputs.version }},${{ env.GHCR_REGISTRY }}:${{ inputs.php }}-fpm-${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-fpm" >> "$GITHUB_OUTPUT"
@@ -157,13 +172,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate tags
         id: tags
         run: |
-          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-unit"
+          TAGS="${{ env.REGISTRY }}:${{ inputs.php }}-unit,${{ env.GHCR_REGISTRY }}:${{ inputs.php }}-unit"
           if [ -n "${{ inputs.version }}" ]; then
-            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-${{ inputs.version }}"
+            TAGS="${TAGS},${{ env.REGISTRY }}:${{ inputs.php }}-unit-${{ inputs.version }},${{ env.GHCR_REGISTRY }}:${{ inputs.php }}-unit-${{ inputs.version }}"
           fi
           echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
           echo "base_tag=${{ env.REGISTRY }}:${{ inputs.php }}-unit" >> "$GITHUB_OUTPUT"
@@ -211,11 +231,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate tags
         id: tags
         run: |
-          echo "tags=${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev" >> "$GITHUB_OUTPUT"
+          echo "tags=${{ env.REGISTRY }}:${{ inputs.php }}-unit-dev,${{ env.GHCR_REGISTRY }}:${{ inputs.php }}-unit-dev" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v7
         with:
