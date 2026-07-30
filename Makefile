@@ -57,7 +57,7 @@ test-local:
 		variant=$$(echo $$i | sed 's/^[0-9]*//'); \
 		case "$$variant" in \
 			"") \
-				cd $$phpv; \
+				cd php$$phpv; \
 				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
 					--build-arg COMPOSER_HASH=$(COMPOSER_HASH) \
 					--build-arg DRUSH_VERSION=$(DRUSH_VERSION) \
@@ -67,7 +67,7 @@ test-local:
 				tests/run-test.sh $(NAME):$$i $$phpver base; \
 				;; \
 			-fpm) \
-				cd $$phpv-fpm; \
+				cd php$$phpv-fpm; \
 				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
 					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \
@@ -75,7 +75,7 @@ test-local:
 				tests/run-test.sh $(NAME):$$i $$phpver fpm; \
 				;; \
 			-unit) \
-				cd $$phpv-unit; \
+				cd php$$phpv-unit; \
 				docker buildx build -t $(NAME):$$i --platform linux/amd64 --load \
 					--build-arg BUILD_DATE=$$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
 					--build-arg VCS_REF=$$(git rev-parse --short HEAD) .; \

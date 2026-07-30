@@ -24,6 +24,7 @@ ENV PHPRUN_DEPS \
   sqlite
 
 RUN set -e \
+  && apk add '!usr-merge-nag' \
   && apk --update upgrade \
   && echo 'https://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories \
   && apk add --upgrade \

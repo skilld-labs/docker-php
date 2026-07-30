@@ -15,6 +15,7 @@ RUN set -e \
   && mkdir -p /var/www \
   && addgroup -g 1000 -S www-skilld \
   && adduser -u 1000 -D -S -G www-skilld www-data \
+  && mkdir -p /var/log/php81 && chown 1000:1000 /var/log/php81 \
   && apk add --no-cache \
   php81-fpm
 
