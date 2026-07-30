@@ -39,8 +39,10 @@ sleep 2
 run_test "PHP-FPM version" "php-fpm${PHPV} -v 2>&1 | grep -q 'PHP ${EXPECTED_PHP}'"
 run_test "PHP-FPM master process" "ps aux | grep -q 'php-fpm.*master' || true"
 run_test "PHP CLI" "php -v | grep -q 'PHP ${EXPECTED_PHP}'"
-run_test "web-user UID 1000" "id web-user 2>/dev/null | grep -q uid=1000"
-run_test "web-group GID 1000" "getent group web-group 2>/dev/null | grep -q ':1000:' || true"
+# PHP 8.1/8.2 images predate the web-user/web-group rename and still ship
+# www-data/www-skilld, so match on the UID/GID rather than the name.
+run_test "service user UID 1000" "getent passwd 1000 2>/dev/null | grep -q ':1000:'"
+run_test "service group GID 1000" "getent group 1000 2>/dev/null | grep -q ':1000:' || true"
 run_test "Config file" "test -f /etc/php${PHPV}/php-fpm.conf"
 run_test "Log directory" "test -d /var/log/php${PHPV}"
 
